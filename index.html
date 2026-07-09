@@ -356,7 +356,29 @@
     color: var(--acc); margin: 14px 0 4px; font-weight: 600;
   }
   .spec-body p { font-size: 13.5px; color: var(--ink2); margin: 0; line-height: 1.55; }
+  .spec-body p em { color: var(--ink); font-style: italic; }
+  .spec-link {
+    display: inline-flex; align-items: center; gap: 5px; margin-top: 16px;
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: .04em;
+    color: var(--acc); text-decoration: none;
+    border: 1px solid color-mix(in srgb, var(--acc) 35%, transparent);
+    background: var(--acc-soft); border-radius: 6px; padding: 5px 11px;
+    transition: border-color .15s;
+  }
+  .spec-link:hover { border-color: var(--acc); text-decoration: underline; }
   .empty { color: var(--mut); font-style: italic; padding: 30px 4px; grid-column: 1 / -1; text-align: center; }
+
+  /* live scoreboard callout */
+  .boards {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    box-shadow: var(--shadow); padding: 18px 20px; margin-bottom: 22px;
+  }
+  .boards h3 { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--mut); font-weight: 600; margin-bottom: 12px; }
+  .boards ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px 20px; }
+  .boards li { font-size: 13.5px; color: var(--mut); line-height: 1.45; }
+  .boards a { font-weight: 600; text-decoration: none; }
+  .boards a:hover { text-decoration: underline; }
+  .boards li span { display: block; font-size: 12.5px; }
 
   /* ---------- small multiples ---------- */
   .multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 14px; }
@@ -599,7 +621,18 @@
     <div class="plate-head">
       <p class="eyebrow">Plate III — The collection</p>
       <h2>32 specimens, 8 families</h2>
-      <p class="lede">The benchmarks you’ll actually meet in papers, model cards and launch posts. Filter by family or status; click any specimen for how it works, why researchers reach for it, and what to distrust. Meters show the approximate best frontier score — a short bar means headroom.</p>
+      <p class="lede">The benchmarks you’ll actually meet in papers, model cards and launch posts. Filter by family or status; click any specimen for how it works, why researchers reach for it, what to distrust — and, where one exists, a link straight to its live leaderboard.</p>
+    </div>
+    <div class="boards">
+      <h3>Start here — live scores across models</h3>
+      <ul>
+        <li><a href="https://lmarena.ai/leaderboard" target="_blank" rel="noopener noreferrer">LMArena ↗</a><span>Live Elo from millions of blind human votes. The industry’s popularity contest.</span></li>
+        <li><a href="https://epoch.ai/benchmarks" target="_blank" rel="noopener noreferrer">Epoch AI Benchmarking Hub ↗</a><span>Independent reruns across GPQA, FrontierMath, SWE-bench and more — one harness for all.</span></li>
+        <li><a href="https://artificialanalysis.ai/leaderboards/models" target="_blank" rel="noopener noreferrer">Artificial Analysis ↗</a><span>Frontier models rerun independently, with cost and speed beside quality.</span></li>
+        <li><a href="https://crfm.stanford.edu/helm/" target="_blank" rel="noopener noreferrer">HELM (Stanford CRFM) ↗</a><span>Standardized, transparent evaluation across many scenarios. The academic reference.</span></li>
+        <li><a href="https://www.swebench.com/" target="_blank" rel="noopener noreferrer">SWE-bench ↗</a><span>The coding-agent scoreboard, with the scaffold behind each number.</span></li>
+        <li><a href="https://arcprize.org/leaderboard" target="_blank" rel="noopener noreferrer">ARC Prize ↗</a><span>ARC-AGI v1 and v2 standings — and cost-per-task, which headlines omit.</span></li>
+      </ul>
     </div>
     <div class="chiprow" id="famChips" role="group" aria-label="Filter by family">
       <span class="lbl">Family</span>
@@ -706,7 +739,7 @@
       <div class="haz">
         <h3>Construct validity</h3>
         <p>Does the benchmark measure what its name implies? Multiple-choice trivia ≠ reasoning; solved GitHub issues from 12 mature Python repos ≠ your codebase. High score, narrow meaning.</p>
-        <p class="case"><b>Field case</b>Models scoring ~80% on SWE-bench Verified dropped to roughly a quarter of that on SWE-bench Pro’s fresher, harder repos. Same skill on paper; very different number.</p>
+        <p class="case"><b>Field case</b>Models near the top of SWE-bench Verified lose more than half their score on SWE-bench Pro’s fresher, harder repos. Same skill on paper; very different number.</p>
       </div>
       <div class="haz">
         <h3>Harness sensitivity</h3>
@@ -734,11 +767,11 @@
   <div class="wrap">
     <h2>Where researchers actually look</h2>
     <div class="sources">
-      <div class="src"><b>LMArena</b><span>Live human preference rankings, millions of votes. Read with the sycophancy caveat.</span></div>
-      <div class="src"><b>Epoch AI Benchmarking Hub</b><span>Independently curated frontier-capability tracking; home of FrontierMath.</span></div>
-      <div class="src"><b>HELM (Stanford CRFM)</b><span>Standardized, transparent reruns across many scenarios — same harness for everyone.</span></div>
-      <div class="src"><b>Artificial Analysis</b><span>Independent reruns of frontier models with cost and speed alongside quality.</span></div>
-      <div class="src"><b>Official task leaderboards</b><span>swebench.com, arcprize.org, tau-bench &amp; friends — the canonical numbers with scaffold details.</span></div>
+      <div class="src"><b><a href="https://lmarena.ai/leaderboard" target="_blank" rel="noopener noreferrer">LMArena ↗</a></b><span>Live human preference rankings, millions of votes. Read with the sycophancy caveat.</span></div>
+      <div class="src"><b><a href="https://epoch.ai/benchmarks" target="_blank" rel="noopener noreferrer">Epoch AI Benchmarking Hub ↗</a></b><span>Independently curated frontier-capability tracking; home of FrontierMath.</span></div>
+      <div class="src"><b><a href="https://crfm.stanford.edu/helm/" target="_blank" rel="noopener noreferrer">HELM (Stanford CRFM) ↗</a></b><span>Standardized, transparent reruns across many scenarios — same harness for everyone.</span></div>
+      <div class="src"><b><a href="https://artificialanalysis.ai/leaderboards/models" target="_blank" rel="noopener noreferrer">Artificial Analysis ↗</a></b><span>Independent reruns of frontier models with cost and speed alongside quality.</span></div>
+      <div class="src"><b><a href="https://www.swebench.com/" target="_blank" rel="noopener noreferrer">Official task leaderboards ↗</a></b><span>swebench.com, arcprize.org, tbench.ai &amp; friends — canonical numbers with scaffold details.</span></div>
       <div class="src"><b>Lab model &amp; system cards</b><span>Primary sources for launch numbers. Remember who typeset the table.</span></div>
     </div>
     <p class="fineprint">Compiled early 2026. All scores are approximate best-published figures at time of writing; frontier numbers move monthly and any specific figure here may already be stale — the shapes, families and failure modes age much more slowly. Fictional models on Plate V are fictional; every benchmark, incident and caveat is real.</p>
@@ -857,53 +890,62 @@ const BENCH = [
     how:"Write the function body from a docstring; hidden unit tests decide. Introduced alongside Codex — pass@1 was 28.8% then.",
     why:"First standard code benchmark; its pass@k metric became the grammar of all code evals. Four years of every code paper citing it.",
     watch:"Saturated (~99%) and memorized. Interview puzzles were never software engineering — its successor benchmarks exist precisely to fix that." },
-  { id:"swebench", name:"SWE-bench Verified", year:2023, fam:"code", status:"work", pct:80, score:"≈80%",
-    tag:"Real GitHub issues from real repos: the current standard for coding agents.",
-    how:"Given a repository and an actual issue, produce a patch; held-out unit tests judge it. ‘Verified’ = 500 issues human-screened (with OpenAI) for solvability. Best scaffolds now resolve ≈80%.",
+  { id:"swebench", name:"SWE-bench Verified", year:2023, fam:"code", status:"sat", pct:95, score:"≈95%",
+    tag:"Real GitHub issues from real repos: the standard for coding agents, now nearly solved.",
+    how:"Given a repository and an actual issue, produce a patch; held-out unit tests judge it. ‘Verified’ = 500 issues human-screened (with OpenAI) for solvability.",
     why:"The closest a public benchmark gets to paid software work, which is why every agent launch quotes it. Rewired the field toward agentic evaluation almost single-handedly.",
-    watch:"12 mature Python repos, all public (contamination clock started at birth). Score depends heavily on the scaffold, not just the model. SWE-bench Pro’s fresher repos cut frontier scores to ~a quarter — read that gap as construct validity." },
-  { id:"livecodebench", name:"LiveCodeBench", year:2024, fam:"code", status:"work", pct:80, score:"≈80%*",
+    watch:"Now ≈95% and saturating fast — the remaining 5% is substantially broken items and scaffold luck. 12 mature Python repos, all public. Score depends heavily on the scaffold, not just the model. SWE-bench Pro’s fresher repos cut frontier scores by more than half — read that gap as construct validity.",
+    link:"https://www.swebench.com/", linkLabel:"Leaderboard" },
+  { id:"livecodebench", name:"LiveCodeBench", year:2024, fam:"code", status:"sat", pct:92, score:"≈92%*",
     tag:"Contest problems harvested continuously — contamination-resistant by design.",
     how:"Problems scraped from LeetCode/Codeforces/AtCoder after each model’s training cutoff, in rolling time windows. Compare models only on problems newer than their cutoffs.",
     why:"The clean answer to code contamination: you can’t memorize what didn’t exist. The time-windowed design exposed models whose scores collapse on fresh problems.",
-    watch:"Algorithmic contests ≠ software engineering. Scores (*) vary by window — always note which one. The live-updating design means numbers aren’t stable across paper versions." },
+    watch:"Algorithmic contests ≠ software engineering. Scores (*) vary by window — the leaderboard reshuffles when you change the date range, so always note which one. Frontier models now clear 90% on recent windows.",
+    link:"https://livecodebench.github.io/leaderboard.html", linkLabel:"Leaderboard" },
   { id:"aider", name:"Aider Polyglot", year:2024, fam:"code", status:"work", pct:88, score:"≈88%",
     tag:"225 hard exercises across six languages, in a real editing workflow.",
     how:"The hardest Exercism problems in C++, Go, Java, JavaScript, Python and Rust; the model must edit files via diffs that actually apply, and fix its own test failures in two tries.",
     why:"Beloved by practitioners because it measures the workflow, not just the code: multi-language, edit-format discipline, self-correction. Tracks perceived coding-assistant quality unusually well.",
-    watch:"Exercism puzzles are still self-contained; no large-codebase navigation. Public problems, so the contamination caveat applies." },
-  { id:"terminalbench", name:"Terminal-Bench", year:2025, fam:"code", status:"frontier", pct:55, score:"≈55%",
-    tag:"Can an agent actually operate a computer’s terminal? Often, no.",
-    how:"Self-contained tasks in a sandboxed terminal — compiling, debugging, sysadmin, data wrangling — judged by outcome checks. Version 2.0 hardened the tasks and the harness.",
-    why:"Terminals are where coding agents actually live; this measures the operational skill that SWE-bench’s scaffolds abstract away. Rapidly adopted by agent teams in 2025.",
-    watch:"Young benchmark, evolving fast — compare numbers only within the same version. Scaffold sensitivity is extreme; ‘the model’ and ‘the harness’ are hard to separate." },
+    watch:"Exercism puzzles are still self-contained; no large-codebase navigation. Public problems, so the contamination caveat applies. The board reports dollar cost beside each score — read them together.",
+    link:"https://aider.chat/docs/leaderboards/", linkLabel:"Leaderboard" },
+  { id:"terminalbench", name:"Terminal-Bench", year:2025, fam:"code", status:"work", pct:88, score:"≈88%",
+    tag:"Can an agent actually operate a computer’s terminal? Increasingly, yes.",
+    how:"Self-contained tasks in a sandboxed terminal — compiling, debugging, sysadmin, data wrangling — judged by outcome checks. Now on its 2.x task set, with 3.0 in the wings.",
+    why:"Terminals are where coding agents actually live; this measures the operational skill that SWE-bench’s scaffolds abstract away. Adopted across agent teams almost immediately.",
+    watch:"Versions are not comparable — a 1.0 number beside a 2.1 number is meaningless, and the leaderboard hosts several at once. Scaffold sensitivity is extreme; ‘the model’ and ‘the harness’ are hard to separate.",
+    link:"https://www.tbench.ai/leaderboard", linkLabel:"Leaderboard" },
 
   /* ---- Agents & Tool Use ---- */
-  { id:"taubench", name:"τ-bench / τ²-bench", year:2024, fam:"agent", status:"work", pct:85, score:"≈85%*",
+  { id:"taubench", name:"τ-bench / τ²-bench", year:2024, fam:"agent", status:"sat", pct:99, score:"≈99% pass@1",
     tag:"Customer-service agents with tools, policies, and simulated humans.",
-    how:"Airline/retail/telecom scenarios: the agent must use APIs, follow policy documents, and talk a simulated (LLM) customer through it. pass^k measures whether it succeeds k times in a row.",
-    why:"The first benchmark to take reliability seriously — pass^8 is what deployment feels like, and it falls off a cliff even when pass^1 (*≈85% retail; airline much lower) looks fine. Industry favorite for tool-use claims.",
-    watch:"The simulated user is itself an LLM with quirks; some failures are the simulator’s. Narrow domains — three, all customer service." },
-  { id:"gaia", name:"GAIA", year:2023, fam:"agent", status:"work", pct:80, score:"≈80%",
+    how:"Airline/retail/telecom scenarios: the agent must use APIs, follow policy documents, and talk a simulated (LLM) customer through it. pass^k measures whether it succeeds k times <em>in a row</em>.",
+    why:"The first benchmark to take reliability seriously — pass^8 is what deployment feels like, and it falls off a cliff even when pass@1 looks fine. Industry favorite for tool-use claims.",
+    watch:"pass@1 is now ≈99% on the easier domains, which is exactly the number you should ignore: read pass^k, where the same models still stumble. The simulated user is itself an LLM with quirks; some failures are the simulator’s. Three domains, all customer service.",
+    link:"https://tau-bench.com/", linkLabel:"Leaderboard" },
+  { id:"gaia", name:"GAIA", year:2023, fam:"agent", status:"sat", pct:null, score:"scaffold-dependent",
     tag:"Assistant questions that are easy for humans and miserable for models.",
     how:"466 questions needing web browsing, file handling, multimodality and multi-step planning, in three difficulty levels. Humans: 92%. GPT-4 with plugins at launch: 15%.",
     why:"Defined the ‘general assistant’ evaluation genre with a beautifully simple premise — conceptually easy, operationally hard. Standard citation for agent frameworks.",
-    watch:"Web answers rot (pages move, facts change), so scores drift for reasons unrelated to capability. Frontier agents have closed most of the gap; successors are queued up." },
-  { id:"osworld", name:"OSWorld", year:2024, fam:"agent", status:"frontier", pct:62, score:"≈62%",
+    watch:"There is no honest single number: a bare model scores in the forties while a good agent scaffold clears 90 on the same questions, so “GAIA score” means little without the harness. Web answers also rot, and the original leaderboard is effectively unmaintained. Hazard #6 in one benchmark.",
+    link:"https://huggingface.co/spaces/gaia-benchmark/leaderboard", linkLabel:"Original leaderboard (stale)" },
+  { id:"osworld", name:"OSWorld", year:2024, fam:"agent", status:"work", pct:85, score:"≈85%",
     tag:"Full computer use: real apps, real OS, screenshots in, clicks out.",
     how:"369 tasks across real desktop applications (files, browsers, office apps) in a VM, judged by scripted end-state checks. Humans manage 72%; first agents scored ~12%.",
     why:"The reference benchmark for the computer-use race — GUI operation is its own skill, distinct from text reasoning, and this measures it end-to-end.",
-    watch:"Execution-environment quirks caused enough grading disputes that a ‘Verified’ revision exists. Slow and expensive to run; results depend on screenshot resolution and action space." },
-  { id:"browsecomp", name:"BrowseComp", year:2025, fam:"agent", status:"frontier", pct:65, score:"≈65%",
+    watch:"Frontier agents now exceed the human baseline, which says more about the task mix than about computer use. Execution-environment quirks caused enough grading disputes that a ‘Verified’ revision exists — check whether a row is verified or self-reported.",
+    link:"https://os-world.github.io/", linkLabel:"Leaderboard" },
+  { id:"browsecomp", name:"BrowseComp", year:2025, fam:"agent", status:"sat", pct:90, score:"≈90%",
     tag:"Finding deliberately hard-to-find facts on the live web.",
     how:"1,266 questions whose answers are short and verifiable but buried — human trainers ensured they couldn’t solve them quickly. Built by OpenAI for deep-research agents.",
-    why:"Browsing persistence and creative search strategy, isolated from writing quality. GPT-4o with browsing scored ~2%; deep-research agents jumped to ~50%+ — a genuine capability gap, cleanly shown.",
-    watch:"Live-web dependence means reproducibility decays. Needle-hunting is one slice of research skill — it says nothing about synthesis quality." },
+    why:"Browsing persistence and creative search strategy, isolated from writing quality. GPT-4o with browsing scored ~2%; deep-research agents jumped past 50% within a year, and past 90% within two — a genuine capability gap, cleanly shown, then closed.",
+    watch:"OpenAI never shipped an official leaderboard — only a paper and eval code, so every number you see is someone else’s harness. Live-web dependence means reproducibility decays. Needle-hunting says nothing about synthesis quality.",
+    link:"https://github.com/openai/simple-evals", linkLabel:"Eval code (no official board)" },
   { id:"vendingbench", name:"Vending-Bench", year:2025, fam:"agent", status:"frontier", pct:null, score:"net worth, $",
     tag:"Run a simulated vending machine business. For months. Without going insane.",
-    how:"The agent manages inventory, pricing, suppliers and email over thousands of simulated days; score is final net worth. Long-horizon coherence is the real subject.",
+    how:"The agent manages inventory, pricing, suppliers and email over a simulated year; score is final net worth in dollars, not a percentage. Long-horizon coherence is the real subject.",
     why:"Measures what almost nothing else does: staying sane and goal-directed over very long horizons. Famous for its failure modes — models spiraling, hallucinating suppliers, one attempting to email the FBI.",
-    watch:"Enormous variance between runs of the same model — means hide the meltdowns. A memorable diagnostic more than a precise ranking; v2 tightened it up." },
+    watch:"Enormous variance between runs of the same model — means hide the meltdowns. A memorable diagnostic more than a precise ranking. v2 is the current version; the best agents clear roughly $8,000 while others go bankrupt on identical inputs.",
+    link:"https://andonlabs.com/evals/vending-bench-2", linkLabel:"Leaderboard" },
 
   /* ---- Chat & Preference ---- */
   { id:"lmarena", name:"LMArena (Chatbot Arena)", year:2023, fam:"chat", status:"work", pct:null, score:"Elo ranking",
@@ -996,7 +1038,7 @@ const SERIES = [
   { name:"GPQA Diamond", fam:"know", note:"grad science", base:{v:65, lbl:"PhD experts ≈65"},
     pts:[[2023,39],[2024,78],[2025,90]] },
   { name:"SWE-bench Verified", fam:"code", note:"real GitHub issues", base:null,
-    pts:[[2023,4],[2024,49],[2025,78]] },
+    pts:[[2023,4],[2024,49],[2025,78],[2026,95]] },
   { name:"Humanity’s Last Exam", fam:"know", note:"with tools", base:null,
     pts:[[2025,5],[2025.6,26],[2026,30]] },
 ];
@@ -1019,7 +1061,7 @@ const GOALS = [
       ["SWE-bench Verified","the industry standard for agentic coding on real issues"],
       ["Terminal-Bench","operational skill: can it actually drive a terminal?"],
       ["Aider Polyglot","multi-language editing workflow; tracks assistant feel"]],
-    caveat:"Scores travel with the scaffold, not just the model — and 80% on 12 mature Python repos does not mean 80% on your codebase." },
+    caveat:"Scores travel with the scaffold, not just the model — and 95% on 12 mature Python repos does not mean 95% on your codebase. SWE-bench Verified is saturating; weight Terminal-Bench and SWE-bench Pro accordingly." },
   { label:"Algorithmic coding, uncontaminated",
     picks:[
       ["LiveCodeBench","problems newer than the training cutoff; memorization can’t help"]],
@@ -1029,7 +1071,7 @@ const GOALS = [
       ["τ²-bench","tools + policies + simulated users; pass^k measures reliability, which is what deployment is"],
       ["OSWorld","full computer use on real apps"],
       ["BrowseComp","persistent web research under adversarial obscurity"]],
-    caveat:"Watch pass^k, not pass@1 — an agent that works four times out of five is a demo, not a product." },
+    caveat:"Watch pass^k, not pass@1 — τ-bench’s pass@1 is ≈99% and tells you nothing. An agent that works four times out of five is a demo, not a product." },
   { label:"Chat quality",
     picks:[
       ["LMArena","the only large-scale live human-preference signal"],
@@ -1119,6 +1161,7 @@ function cardHTML(b){
           <h4>How it works</h4><p>${b.how}</p>
           <h4>Why researchers use it</h4><p>${b.why}</p>
           <h4>Watch out</h4><p>${b.watch}</p>
+          ${b.link ? `<a class="spec-link" href="${b.link}" target="_blank" rel="noopener noreferrer">${b.linkLabel} <span aria-hidden="true">↗</span></a>` : ""}
         </div>
       </div>
     </div>
