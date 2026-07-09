@@ -539,7 +539,7 @@
     <circle cx="340" cy="300" r="3.5" fill="var(--f-know)" opacity=".45"/>
   </svg>
   <div class="wrap hero-in">
-    <span class="stamp rise">Field data compiled early 2026 · scores approximate</span>
+    <span class="stamp rise">Spot-checked against live leaderboards · July 2026</span>
     <h1 class="rise">A Field Guide to <em>LLM Benchmarks</em></h1>
     <p class="sub rise">What researchers measure, why they chose it, and how every benchmark eventually gets eaten.</p>
     <p class="lede rise">Every number in a model launch — “92% on MMLU”, “80% on SWE-bench” — comes from a benchmark: a fixed set of test items plus a scoring rule. Researchers lean on them not because they are perfect measures of intelligence (they aren’t), but because they are <strong>comparable</strong>: the same questions, asked of every model, turn “feels smarter” into a number you can track, publish, and argue about. This guide catalogues the ones that matter and how to read them like a researcher.</p>
@@ -654,7 +654,7 @@
       <p class="lede">Best published score by year (approximate, assembled from papers and leaderboards). The pattern repeats: a new benchmark starts in the foothills, climbs for two or three years, then flattens into the shaded saturation zone — and the field moves to a harder one. Hover any tile for values.</p>
     </div>
     <div class="multiples" id="multiples"></div>
-    <p class="chart-note">Shaded zone ≈ saturated (90–100%). Dashed line where a human-expert baseline exists. HLE and SWE-bench Verified are younger — that is the point.</p>
+    <p class="chart-note">Shaded zone ≈ saturated (90–100%). Dashed line where a human-expert baseline exists. Five of these six are now inside the band; SWE-bench Verified took three years to get there, GPQA two. Humanity’s Last Exam is the only one still climbing in open air — and it is two years old.</p>
     <details class="datatable">
       <summary>View the same data as a table</summary>
       <div class="tblwrap">
@@ -734,7 +734,7 @@
       <div class="haz">
         <h3>Judge bias</h3>
         <p>Many evals use an LLM as the grader. LLM judges prefer longer answers, confident tone, and — measurably — output that resembles their own. The judge is part of the experiment.</p>
-        <p class="case"><b>Field case</b>AlpacaEval had to ship a “length-controlled” version after win rates turned out to correlate embarrassingly well with answer length.</p>
+        <p class="case"><b>Field case</b>AlpacaEval shipped a “length-controlled” version after win rates tracked answer length. It wasn’t enough: the #1 entry on its live board today is an adversarial null model that games the judge and answers nothing.</p>
       </div>
       <div class="haz">
         <h3>Construct validity</h3>
@@ -774,7 +774,7 @@
       <div class="src"><b><a href="https://www.swebench.com/" target="_blank" rel="noopener noreferrer">Official task leaderboards ↗</a></b><span>swebench.com, arcprize.org, tbench.ai &amp; friends — canonical numbers with scaffold details.</span></div>
       <div class="src"><b>Lab model &amp; system cards</b><span>Primary sources for launch numbers. Remember who typeset the table.</span></div>
     </div>
-    <p class="fineprint">Compiled early 2026. All scores are approximate best-published figures at time of writing; frontier numbers move monthly and any specific figure here may already be stale — the shapes, families and failure modes age much more slowly. Fictional models on Plate V are fictional; every benchmark, incident and caveat is real.</p>
+    <p class="fineprint">Scores spot-checked against the live leaderboards linked above in July 2026, and they move monthly — the shapes, families and failure modes age far more slowly than any figure here. Where a benchmark has no leaderboard, no link is given, because a number nobody reruns is a claim, not a measurement. Plate V’s models and their scores are invented to demonstrate table-reading; every benchmark, incident and caveat elsewhere on this page is real. Companion page: <a href="video/index.html">A Field Guide to Video-Generation Benchmarks</a>.</p>
   </div>
 </footer>
 
@@ -831,26 +831,30 @@ const BENCH = [
     how:"15,908 four-option questions harvested from real exams across 57 subjects. Score = plain accuracy, usually 5-shot.",
     why:"Breadth plus one number plus half a decade of prior results. Every model since GPT-3 (43.9%) has an MMLU score, which made it the default axis of every comparison chart — comparability is the whole product.",
     watch:"Effectively done: frontier models cluster at 90%+, around the estimated expert ceiling. Audits (MMLU-Redux) found errors in a meaningful share of questions. Contamination is assumed. Papers have moved to MMLU-Pro." },
-  { id:"mmlupro", name:"MMLU-Pro", year:2024, fam:"know", status:"work", pct:87, score:"≈87%",
+  { id:"mmlupro", name:"MMLU-Pro", year:2024, fam:"know", status:"sat", pct:89, score:"≈89%",
     tag:"MMLU rebuilt for the reasoning era: ten options, harder questions.",
     how:"~12,000 questions, 10 answer choices instead of 4 (guessing yields 10%, not 25%), noise-filtered, weighted toward reasoning over recall. Scored with chain-of-thought.",
     why:"Kept MMLU’s breadth and familiarity while restoring headroom — launch scores dropped 20–30 points below MMLU. The natural successor slot in model cards.",
-    watch:"Same public-dataset contamination clock is ticking, and it’s climbing fast. Still multiple-choice, with everything that format hides." },
-  { id:"gpqa", name:"GPQA Diamond", year:2023, fam:"know", status:"work", pct:90, score:"≈90%",
-    tag:"Graduate-level science questions built to be un-Googleable.",
+    watch:"It restored headroom for about eighteen months; frontier models now cluster near 90 and the gaps are noise again. Same public-dataset contamination clock, and still multiple-choice, with everything that format hides.",
+    link:"https://huggingface.co/spaces/TIGER-Lab/MMLU-Pro", linkLabel:"Leaderboard" },
+  { id:"gpqa", name:"GPQA Diamond", year:2023, fam:"know", status:"sat", pct:95, score:"≈95%",
+    tag:"Graduate-level science questions built to be un-Googleable. Now answered anyway.",
     how:"198 expert-written chemistry, physics and biology questions (the ‘Diamond’ subset of 448). PhDs in the domain score ~65–70%; skilled non-experts with full web access manage ~34%.",
-    why:"“Google-proof” by construction — it separates knowing from looking up. Became the standard hard-knowledge line in every frontier model card of 2024–25.",
-    watch:"Frontier models now exceed the human-expert baseline, so it’s ageing into the ceiling. 198 questions means ±3 points is a handful of items. Answers are public." },
-  { id:"hle", name:"Humanity’s Last Exam", year:2025, fam:"know", status:"frontier", pct:30, score:"≈30%†",
+    why:"“Google-proof” by construction — it separates knowing from looking up. Was the standard hard-knowledge line in every frontier model card of 2024–25.",
+    watch:"Effectively solved at ≈95%, thirty points above the PhD baseline. Its authors never ran a leaderboard, so quote a tracker that reruns everything (Epoch) rather than a lab’s own table. 198 questions means ±3 points is a handful of items.",
+    link:"https://epoch.ai/benchmarks/gpqa-diamond", linkLabel:"Epoch AI tracker" },
+  { id:"hle", name:"Humanity’s Last Exam", year:2025, fam:"know", status:"frontier", pct:46, score:"≈46%",
     tag:"The deliberately-final academic exam: 2,500 questions at the edge of human expertise.",
     how:"~2,500 questions across 100+ subjects, crowd-sourced from nearly 1,000 domain experts, filtered so frontier models failed them at submission time. Text and multimodal.",
-    why:"Built explicitly because everything else was saturating — the name is the thesis. Currently the headline “how far from expert humanity?” number (best ≈30% with tools).",
-    watch:"Some answers are disputed; models are badly calibrated on it (confident and wrong). Expect the usual curve — it was at single digits when launched in January 2025." },
-  { id:"arcagi", name:"ARC-AGI", year:2019, fam:"know", status:"frontier", pct:25, score:"≈25% (v2)",
-    tag:"Abstract grid puzzles: fluid intelligence, no knowledge required.",
-    how:"Visual induction puzzles — infer the transformation rule from 2–3 examples, apply it to a new grid. Trivial for humans, brutal for models. Private eval set; the ARC Prize pays for open solutions.",
-    why:"Chollet’s counter-thesis to knowledge benchmarks: measure generalization to genuinely novel tasks, not stored skill. o3’s 2024 breakthrough on v1 (~76–88% at enormous compute) was a landmark; ARC-AGI-2 promptly restored the gap.",
-    watch:"Compute-per-task matters enormously and headlines omit it. Puzzle format is narrow — a high score means something real but specific." },
+    why:"Built explicitly because everything else was saturating — the name is the thesis. Still the headline “how far from expert humanity?” number, and it climbed from single digits to the mid-forties in eighteen months.",
+    watch:"Every canonical board is <em>no tools</em>. Any 60%+ figure you see is a with-tools or agent run reported off-board — never compare the two. Models remain badly calibrated here (confident and wrong), and the boards disagree with each other by several points.",
+    link:"https://lastexam.ai/", linkLabel:"Leaderboard (no tools)" },
+  { id:"arcagi", name:"ARC-AGI", year:2019, fam:"know", status:"frontier", pct:2, score:"<2% (v3)",
+    tag:"Abstract puzzles: fluid intelligence, no knowledge required. Version 3 humbled everyone.",
+    how:"v1/v2: infer a transformation rule from 2–3 grid examples, apply it to a new grid. v3 (March 2026) drops agents into interactive environments with no instructions, no stated goal and no rules — they must discover everything by experiment.",
+    why:"Chollet’s counter-thesis to knowledge benchmarks: measure generalization to genuinely novel tasks, not stored skill. Each version restores the gap the last one lost — v1 is now 98% (tying the human panel) and v2 is ≈85%, but frontier models score <b>under 2% on v3, where humans score 100%</b>.",
+    watch:"Compute-per-task matters enormously and headlines omit it — the board publishes cost per task, so read it. Beware self-reported v2 numbers; ARC Prize verifies its own, and verified scores run lower.",
+    link:"https://arcprize.org/leaderboard", linkLabel:"Leaderboard (v1/v2/v3)" },
   { id:"bbh", name:"BIG-Bench / BBH", year:2022, fam:"know", status:"ret", pct:95, score:"≈95%",
     tag:"204 crowd-sourced tasks; BBH was the ‘still hard’ subset. Both now solved.",
     how:"BIG-Bench pooled 204 tasks from 450 authors; BIG-Bench Hard picked the 23 where models lagged average human raters. Chain-of-thought prompting cracked most of them.",
@@ -873,16 +877,18 @@ const BENCH = [
     how:"High-school competition mathematics across seven topics; exact-match answers. The 500-problem ‘MATH-500’ subset became the common currency.",
     why:"The step up from GSM8K once that saturated — real competition math, not word problems. Central to the 2024 reasoning-model story (o1’s jump here made headlines).",
     watch:"Reasoning models pushed it into the ceiling within a year. Contamination widely suspected; the field moved to fresh AIME sets and FrontierMath." },
-  { id:"aime", name:"AIME 2024 / 2025", year:2024, fam:"math", status:"work", pct:95, score:"≈95%†",
+  { id:"aime", name:"AIME (current year)", year:2024, fam:"math", status:"sat", pct:95, score:"≈95%†",
     tag:"The actual American Invitational Math Exam, scored like a student.",
     how:"30 problems per year (two 15-problem exams), integer answers 0–999. Using each year’s fresh exam limits contamination — for a while.",
     why:"Genuinely hard, renewed annually, and human-anchored (qualifying students solve ~5/15). The de facto reasoning benchmark of 2025 model cards.",
-    watch:"Only 30 items — one problem is ~3.3 points, so treat small gaps as noise. Frequently reported as cons@64 or with tools (†): read the footnotes. Frontier models also hit IMO gold in 2025, so headroom is thin." },
-  { id:"frontiermath", name:"FrontierMath", year:2024, fam:"math", status:"frontier", pct:30, score:"≈30%",
-    tag:"Research-level mathematics, unpublished problems, expert-hours each.",
-    how:"~300 novel problems by research mathematicians, tiered up to ‘hours for a specialist’. Kept private (mostly) to resist contamination; run by Epoch AI.",
+    watch:"Only 30 items — one problem is ~3.3 points, so treat small gaps as noise. Frequently reported as cons@64 or with tools (†): read the footnotes. Frontier models hit IMO gold in 2025, so headroom is gone; MathArena tracks each fresh competition as it happens.",
+    link:"https://matharena.ai/", linkLabel:"MathArena (fresh competitions)" },
+  { id:"frontiermath", name:"FrontierMath", year:2024, fam:"math", status:"sat", pct:88, score:"≈88%",
+    tag:"Research-level mathematics, unpublished problems, expert-hours each — and now mostly solved.",
+    how:"~300 novel problems by research mathematicians (Tiers 1–3) plus 50 research-level Tier 4 problems, all unpublished. Kept private to resist contamination; run by Epoch AI on a standard harness <em>with a Python tool</em>.",
     why:"Built for the post-MATH world: problems that can’t be memorized because they’ve never been published. Tao called them ‘extremely challenging’. The serious end of math evals.",
-    watch:"OpenAI funded it and had access to much of the problem set — a governance flap that led to a true holdout set. Small N per tier; scores jump in steps." },
+    watch:"That ≈88% is a with-code-execution number, not closed-book — no other math benchmark on this page is scored that way. Epoch shipped a corrected v2 in June 2026 after an audit found errors across a substantial share of problems, so pre-v2 scores aren’t comparable. OpenAI funded it and had access to much of the problem set, which is why a true holdout exists.",
+    link:"https://epoch.ai/benchmarks/frontiermath-tiers-1-3-v2", linkLabel:"Leaderboard (Tiers 1–3 v2)" },
 
   /* ---- Coding ---- */
   { id:"humaneval", name:"HumanEval", year:2021, fam:"code", status:"ret", pct:99, score:"≈99%",
@@ -950,9 +956,10 @@ const BENCH = [
   /* ---- Chat & Preference ---- */
   { id:"lmarena", name:"LMArena (Chatbot Arena)", year:2023, fam:"chat", status:"work", pct:null, score:"Elo ranking",
     tag:"Millions of blind human votes; the industry’s live popularity contest.",
-    how:"Users chat with two anonymous models, vote for the better answer; Bradley–Terry/Elo aggregates votes into a live ranking. Style-controlled variants attempt to correct for formatting appeal.",
+    how:"Users chat with two anonymous models, vote for the better answer; Bradley–Terry/Elo aggregates votes into a live ranking — now past seven million votes across hundreds of models. Style-controlled variants attempt to correct for formatting appeal.",
     why:"The largest ongoing human-preference experiment in existence — it measures the thing users actually feel, which no static benchmark does. A top Arena slot moves markets.",
-    watch:"Preference ≠ correctness: verbosity, confidence and flattery win votes. The Llama 4 episode (a chipper Arena-special variant outranking the shipped model) and ‘The Leaderboard Illusion’ paper detail how it can be farmed." },
+    watch:"Preference ≠ correctness: verbosity, confidence and flattery win votes. The Llama 4 episode (a chipper Arena-special variant outranking the shipped model) and ‘The Leaderboard Illusion’ paper detail how it can be farmed. Elo is comparable only within one snapshot.",
+    link:"https://lmarena.ai/leaderboard", linkLabel:"Leaderboard" },
   { id:"mtbench", name:"MT-Bench", year:2023, fam:"chat", status:"ret", pct:null, score:"/10, legacy",
     tag:"80 multi-turn questions, GPT-4 as judge. The proof-of-concept for LLM judging.",
     how:"Two-turn open-ended prompts across eight categories; a strong LLM grades answers 1–10. Shipped alongside Chatbot Arena by LMSYS.",
@@ -962,7 +969,8 @@ const BENCH = [
     tag:"Automated stand-ins for the Arena: LLM judges, length-corrected.",
     how:"Curated hard prompts (Arena-Hard mines them from real Arena battles); an LLM judge computes win rates against a reference model, with length-controlled scoring after the verbosity scandal.",
     why:"Arena-grade signal in hours instead of weeks of vote collection — the standard pre-release chat eval inside labs.",
-    watch:"Judge self-preference persists (a GPT judge mildly favors GPT-flavored prose). Win rate against one reference model is a relative, movable zero." },
+    watch:"Look at who sits at #1 on AlpacaEval’s live board: an adversarial <em>NullModel</em> that games the judge outright, above every real model. Below it sit ensembles, not frontier chat models. Judge self-preference persists, and a win rate against one reference model is a relative, movable zero. Arena-Hard is a repo table, not a live board.",
+    link:"https://tatsu-lab.github.io/alpaca_eval/", linkLabel:"AlpacaEval leaderboard" },
 
   /* ---- Long Context ---- */
   { id:"niah", name:"Needle in a Haystack", year:2023, fam:"ctx", status:"ret", pct:99, score:"≈99%",
@@ -970,11 +978,12 @@ const BENCH = [
     how:"Plant an out-of-place fact (‘the best thing in San Francisco is…’) at varying depths in long filler text; query it. Results shown as depth-×-length heatmaps.",
     why:"Made long-context claims falsifiable overnight, with a viral visualization. Vendors raced to post green heatmaps.",
     watch:"Retrieval of a planted oddity is the easiest possible long-context task — models ace it while failing to actually reason over long documents. Its green grid says ‘not broken’, not ‘good’." },
-  { id:"ruler", name:"RULER", year:2024, fam:"ctx", status:"work", pct:93, score:"≈93%*",
+  { id:"ruler", name:"RULER", year:2024, fam:"ctx", status:"work", pct:96, score:"≈96%*",
     tag:"Claimed context vs. effective context — usually not the same number.",
     how:"Synthetic tasks (multiple needles, variable tracking, aggregation, multi-hop QA) generated at controlled lengths; find where performance falls off a cliff.",
     why:"Introduced the ‘effective context length’ concept: many models claiming 128k degraded badly past 32–64k. The standard citation for honest context evaluation.",
-    watch:"Still synthetic — passing RULER (*at 128k) doesn’t guarantee comprehension of real long documents. Successors (MRCR, Fiction.LiveBench) probe deeper reasoning over narrative." },
+    watch:"Still synthetic — passing RULER (*at 128k) doesn’t guarantee comprehension of real long documents. Its scores table lives in a GitHub README and has not been updated for the current model generation, so the ‘leaderboard’ is a historical artifact. Successors (MRCR, Fiction.LiveBench) probe deeper reasoning over narrative.",
+    link:"https://github.com/NVIDIA/RULER", linkLabel:"Scores table (stale)" },
 
   /* ---- Factuality & Safety ---- */
   { id:"truthfulqa", name:"TruthfulQA", year:2021, fam:"fact", status:"ret", pct:null, score:"rarely cited",
@@ -984,31 +993,35 @@ const BENCH = [
     watch:"Small, quirky scoring, and thoroughly optimized-against. Its headline finding (bigger models were less truthful) described 2021 models, not today’s." },
   { id:"simpleqa", name:"SimpleQA", year:2024, fam:"fact", status:"work", pct:55, score:"≈55%",
     tag:"Short factual questions that models confidently get wrong.",
-    how:"4,326 single-answer factual questions, adversarially collected against GPT-4. Scored correct / incorrect / not attempted — the three-way split is the point.",
+    how:"4,326 single-answer factual questions, adversarially collected against GPT-4. Scored correct / incorrect / not attempted — the three-way split is the point. A cleaned <em>SimpleQA-Verified</em> revision is the version trackers now rerun.",
     why:"The standard hallucination number: it separates knowing, guessing, and (crucially) declining to guess. Calibration made visible in one table.",
-    watch:"Deliberately obscure trivia — it undersells usefulness and oversells doom. With browsing enabled it’s nearly free, so tool-use footnotes matter." },
-  { id:"ifeval", name:"IFEval", year:2023, fam:"fact", status:"work", pct:93, score:"≈93%",
+    watch:"Deliberately obscure trivia — it undersells usefulness and oversells doom. With browsing enabled it’s nearly free, so tool-use footnotes matter. Quote the Verified variant; the original carries label noise of its own.",
+    link:"https://epoch.ai/benchmarks/simple-qa-verified", linkLabel:"SimpleQA-Verified tracker" },
+  { id:"ifeval", name:"IFEval", year:2023, fam:"fact", status:"sat", pct:93, score:"≈93%",
     tag:"Instructions a script can check: word counts, formats, forbidden commas.",
     how:"541 prompts with 25 types of verifiable constraints (‘exactly three paragraphs’, ‘no commas’, ‘mention Kuala Lumpur twice’). No judge needed — a regex decides.",
     why:"Instruction-following measured without an LLM judge’s opinions. Cheap, objective, and adopted everywhere from papers to fine-tuning recipes.",
-    watch:"Constraint compliance is the shallow end of instruction-following; it says nothing about following intent. High scores are table stakes now." },
+    watch:"Constraint compliance is the shallow end of instruction-following; it says nothing about following intent. High scores are table stakes now — and it never had a home of its own: it lived inside the HF Open LLM Leaderboard, which is archived and frozen." },
   { id:"safety", name:"Safety suites (HarmBench, AgentHarm…)", year:2024, fam:"fact", status:"work", pct:null, score:"no single number",
     tag:"Refusal robustness, jailbreaks, and what agents do with dangerous asks.",
     how:"Standardized attack sets (HarmBench: red-teaming methods vs. behaviors; AgentHarm: harmful multi-step agent tasks) plus each lab’s internal evals and external audits (e.g. UK AISI).",
     why:"Regulators, enterprises and the labs themselves need evidence beyond ‘trust us’. Public suites make safety claims comparable and falsifiable — imperfectly, but measurably.",
-    watch:"Public attack sets go stale fast; models can be tuned to pass the known ones. Refusing benchmarks is also easy to overdo — over-refusal has its own evals (and its own failures)." },
+    watch:"Neither ships a live public scoreboard — results live in papers and system cards, which means nobody reruns anybody. Public attack sets go stale fast; models can be tuned to pass the known ones. Over-refusal has its own evals, and its own failures.",
+    link:"https://www.harmbench.org/", linkLabel:"HarmBench (framework, no live board)" },
 
   /* ---- Multimodal ---- */
-  { id:"mmmu", name:"MMMU", year:2023, fam:"mm", status:"work", pct:82, score:"≈82%",
+  { id:"mmmu", name:"MMMU", year:2023, fam:"mm", status:"sat", pct:85, score:"≈85%",
     tag:"College exams with figures: charts, scores, circuits, slides.",
     how:"11,500 questions from university exams and textbooks across 30 subjects, each requiring the image (diagrams, music notation, medical scans). Human experts: 88.6%.",
     why:"The MMLU of vision-language — expert-level, broad, and the default headline number for any multimodal launch since GPT-4V scored 56%.",
-    watch:"Multiple-choice format again; models sometimes answer from text priors without truly reading the figure. Approaching the expert baseline, so the saturation clock is audible." },
-  { id:"mathvista", name:"MathVista", year:2023, fam:"mm", status:"sat", pct:82, score:"≈82%",
+    watch:"At ≈85% it is within a few points of the human-expert baseline, so the saturation clock has nearly run out. Multiple-choice format again; models sometimes answer from text priors without truly reading the figure.",
+    link:"https://mmmu-benchmark.github.io/", linkLabel:"Leaderboard" },
+  { id:"mathvista", name:"MathVista", year:2023, fam:"mm", status:"sat", pct:85, score:"≈85%",
     tag:"Math that lives in pictures: plots, geometry, puzzle grids.",
     how:"6,141 problems combining visual understanding with mathematical reasoning, drawn from 28 source datasets plus new puzzle types.",
     why:"Isolated the visual-reasoning gap cleanly: models that aced text math fell apart reading a bar chart. Standard in every VLM eval table since.",
-    watch:"Frontier models passed the (surprisingly low) human baseline of 60% long ago; the remaining gap includes plenty of label noise. Successors target harder visual reasoning." },
+    watch:"Frontier models passed the (surprisingly low) human baseline of 60% long ago; the remaining gap includes plenty of label noise. The board’s top entries are increasingly bespoke research systems rather than shipped models — read the model column, not just the score.",
+    link:"https://mathvista.github.io/", linkLabel:"Leaderboard" },
 ];
 
 /* ---- lifecycle stages ---- */
@@ -1036,11 +1049,11 @@ const SERIES = [
   { name:"HumanEval", fam:"code", note:"code pass@1", base:null,
     pts:[[2021,29],[2022,47],[2023,85],[2024,94],[2025,99]] },
   { name:"GPQA Diamond", fam:"know", note:"grad science", base:{v:65, lbl:"PhD experts ≈65"},
-    pts:[[2023,39],[2024,78],[2025,90]] },
+    pts:[[2023,39],[2024,78],[2025,90],[2026,95]] },
   { name:"SWE-bench Verified", fam:"code", note:"real GitHub issues", base:null,
     pts:[[2023,4],[2024,49],[2025,78],[2026,95]] },
-  { name:"Humanity’s Last Exam", fam:"know", note:"with tools", base:null,
-    pts:[[2025,5],[2025.6,26],[2026,30]] },
+  { name:"Humanity’s Last Exam", fam:"know", note:"no tools", base:null,
+    pts:[[2025,5],[2025.6,26],[2026,46]] },
 ];
 
 /* ---- chooser goals ---- */
@@ -1049,13 +1062,14 @@ const GOALS = [
     picks:[
       ["GPQA Diamond","the hard-knowledge standard; un-Googleable by design"],
       ["MMLU-Pro","breadth with headroom; the successor to five years of MMLU tables"],
-      ["HLE","if you need to separate frontier models from each other"]],
-    caveat:"Plain MMLU tells you a model isn’t broken, not that it’s good — everything competent scores 88–92 now." },
+      ["HLE","if you need to separate frontier models from each other — the only one here with real headroom left"]],
+    caveat:"GPQA and MMLU-Pro have both saturated (≈95% and ≈89%). They now tell you a model isn’t broken, not that it’s good. Compare no-tools HLE to no-tools HLE only." },
   { label:"Math reasoning",
     picks:[
       ["AIME (current year)","fresh annually, human-anchored, genuinely hard"],
-      ["FrontierMath","unpublished research-level problems; the contamination-proof deep end"]],
-    caveat:"Check the footnotes: cons@64 and tool use inflate math numbers more than any other family. GSM8K/MATH are smoke tests now." },
+      ["FrontierMath","unpublished research-level problems; the contamination-proof deep end"],
+      ["ARC-AGI-3","if what you actually want is novel-problem reasoning, not math"]],
+    caveat:"Check the footnotes: cons@64 and tool use inflate math numbers more than any other family — FrontierMath’s ≈88% is scored with code execution. GSM8K/MATH are smoke tests now." },
   { label:"Coding — real software work",
     picks:[
       ["SWE-bench Verified","the industry standard for agentic coding on real issues"],
