@@ -357,7 +357,29 @@
     color: var(--acc); margin: 14px 0 4px; font-weight: 600;
   }
   .spec-body p { font-size: 13.5px; color: var(--ink2); margin: 0; line-height: 1.55; }
+  .spec-body p em { color: var(--ink); font-style: italic; }
+  .spec-link {
+    display: inline-flex; align-items: center; gap: 5px; margin-top: 16px;
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: .04em;
+    color: var(--acc); text-decoration: none;
+    border: 1px solid color-mix(in srgb, var(--acc) 35%, transparent);
+    background: var(--acc-soft); border-radius: 6px; padding: 5px 11px;
+    transition: border-color .15s;
+  }
+  .spec-link:hover { border-color: var(--acc); text-decoration: underline; }
   .empty { color: var(--mut); font-style: italic; padding: 30px 4px; grid-column: 1 / -1; text-align: center; }
+
+  /* live scoreboard callout */
+  .boards {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    box-shadow: var(--shadow); padding: 18px 20px; margin-bottom: 22px;
+  }
+  .boards h3 { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--mut); font-weight: 600; margin-bottom: 12px; }
+  .boards ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px 20px; }
+  .boards li { font-size: 13.5px; color: var(--mut); line-height: 1.45; }
+  .boards a { font-weight: 600; text-decoration: none; }
+  .boards a:hover { text-decoration: underline; }
+  .boards li span { display: block; font-size: 12.5px; }
 
   /* ---------- dimension chart ---------- */
   .dimchart {
@@ -500,7 +522,7 @@
     <circle cx="340" cy="300" r="3.5" fill="var(--f-suite)" opacity=".45"/>
   </svg>
   <div class="wrap hero-in">
-    <span class="stamp rise">Field data compiled early 2026 · scores approximate</span>
+    <span class="stamp rise">Spot-checked against live leaderboards · July 2026</span>
     <h1 class="rise">A Field Guide to <em>Video-Gen Benchmarks</em></h1>
     <p class="sub rise">How Veo, Seedance, Kling, Wan and LTX get ranked — and why every demo reel is also a benchmark claim.</p>
     <p class="lede rise">Every video-model launch arrives with the same three artifacts: a demo reel, a bar chart of human win rates, and an arena ranking. Unlike an LLM’s math score, none of them can be checked against an answer key — there is no ground truth for “a beautiful shot of a heron at dawn.” So the field grades <strong>perception itself</strong>, with proxy metrics, machine judges and human votes, each gameable in its own way. This guide catalogues the instruments and how to read them. (Companion: <a href="../index.html">the LLM benchmarks guide</a>.)</p>
@@ -547,15 +569,15 @@
     <div class="plate-head">
       <p class="eyebrow">Plate II — The subjects under study</p>
       <h2>The models these instruments measure</h2>
-      <p class="lede">The frontier as of early 2026 — and how each presents its numbers.</p>
+      <p class="lede">The frontier as of mid-2026 — and how each presents its numbers. Version numbers churn fast; the postures don’t.</p>
     </div>
     <div class="castgrid">
-      <div class="cast"><h3>Veo 3.x</h3><span class="meta">Google DeepMind · <b>closed</b> (Gemini API / Flow)</span><p>Native audio + video. Markets with human side-by-sides, arena standings and filmmaker demos; a fixture near the top of preference rankings at each release.</p></div>
-      <div class="cast"><h3>Sora 2</h3><span class="meta">OpenAI · <b>closed</b> (app / API)</span><p>Made “world simulator” the sales pitch. The physics benchmarks in this guide exist partly to audit exactly that claim.</p></div>
-      <div class="cast"><h3>Seedance 1.x</h3><span class="meta">ByteDance · <b>closed</b> (Volcano Engine API)</span><p>Debuted at #1 on Artificial Analysis’ text-to-video and image-to-video arenas; emphasizes multi-shot narrative generation.</p></div>
-      <div class="cast"><h3>Kling 2.x</h3><span class="meta">Kuaishou · <b>closed</b> (app / API)</span><p>Arena mainstay with an enormous creator base; strong image-to-video and motion controls. Launch posts lean on win-rate studies and arena Elo.</p></div>
-      <div class="cast"><h3>Wan 2.x</h3><span class="meta">Alibaba · <b>open weights</b> (Apache-2.0)</span><p>Topped VBench at release; the open ecosystem’s reference model and the baseline every open-video paper compares against. (Wan 2.5 adds audio, closed-first.)</p></div>
-      <div class="cast"><h3>LTX / LTX-2</h3><span class="meta">Lightricks · <b>open weights</b></span><p>Competes on latency and cost as much as quality — near-real-time generation on accessible hardware. The efficiency baseline other releases quote.</p></div>
+      <div class="cast"><h3>Veo</h3><span class="meta">Google DeepMind · <b>closed</b> (Gemini API / Flow)</span><p>Native audio + video. Markets with human side-by-sides, arena standings and filmmaker demos; a fixture near the top of preference rankings at each release.</p></div>
+      <div class="cast"><h3>Sora</h3><span class="meta">OpenAI · <b>closed</b> (app / API)</span><p>Made “world simulator” the sales pitch. The physics benchmarks in this guide exist partly to audit exactly that claim — and it scores in the single digits on VideoPhy-2’s hard subset.</p></div>
+      <div class="cast"><h3>Seedance</h3><span class="meta">ByteDance · <b>closed</b> (Dreamina / Volcano Engine)</span><p>Debuted at #1 on Artificial Analysis’ T2V and I2V arenas and has stayed there; Seedance 2.0 currently leads the with-audio board. Emphasizes multi-shot narrative.</p></div>
+      <div class="cast"><h3>Kling</h3><span class="meta">Kuaishou · <b>closed</b> (app / API)</span><p>Arena mainstay with an enormous creator base; strong image-to-video and motion controls. Launch posts lean on win-rate studies and arena Elo.</p></div>
+      <div class="cast"><h3>Wan</h3><span class="meta">Alibaba · <b>open weights</b> (Apache-2.0)</span><p>Topped VBench at release and still leads VideoPhy-2’s hard subset — an open model beating closed ones on physics. The baseline every open-video paper compares against.</p></div>
+      <div class="cast"><h3>LTX</h3><span class="meta">Lightricks · <b>open weights</b></span><p>Competes on latency and cost as much as quality — near-real-time generation on accessible hardware. Leads the open-weights arena board; the efficiency baseline others quote.</p></div>
     </div>
   </section>
 
@@ -596,7 +618,18 @@
     <div class="plate-head">
       <p class="eyebrow">Plate IV — The collection</p>
       <h2>22 specimens, 6 families</h2>
-      <p class="lede">The benchmarks and metrics you’ll meet in video and image model reports. Filter by family or status; click any specimen for how it works, why labs reach for it, and what to distrust. Meters show the approximate top reported score — a short bar means headroom.</p>
+      <p class="lede">The benchmarks and metrics you’ll meet in video and image model reports. Filter by family or status; click any specimen for how it works, why labs reach for it, what to distrust — and, where one exists, a link straight to its live scoreboard.</p>
+    </div>
+    <div class="boards">
+      <h3>Start here — live scores across models</h3>
+      <ul>
+        <li><a href="https://artificialanalysis.ai/video/leaderboard/text-to-video" target="_blank" rel="noopener noreferrer">Artificial Analysis Video Arena ↗</a><span>Blind human votes, Elo. Separate T2V, I2V and video-editing boards. The launch-day scoreboard.</span></li>
+        <li><a href="https://huggingface.co/spaces/Vchitect/VBench_Leaderboard" target="_blank" rel="noopener noreferrer">VBench &amp; VBench-2.0 leaderboard ↗</a><span>Dimension-level scores per model, both versions on one Space. Read dimensions, not totals.</span></li>
+        <li><a href="https://videophy2.github.io/" target="_blank" rel="noopener noreferrer">VideoPhy-2 leaderboard ↗</a><span>Physical commonsense, open vs. closed. The hard subset is where claims go to die.</span></li>
+        <li><a href="https://github.com/google-deepmind/physics-IQ-benchmark#leaderboard" target="_blank" rel="noopener noreferrer">Physics-IQ leaderboard ↗</a><span>Continuation-vs-reality. Two boards — quote the stricter <em>Verified</em> one.</span></li>
+        <li><a href="https://huggingface.co/spaces/Howieeeee/WorldScore_Leaderboard" target="_blank" rel="noopener noreferrer">WorldScore leaderboard ↗</a><span>Camera controllability, quality and dynamics across video, 3D and 4D generators.</span></li>
+        <li><a href="https://github.com/facebookresearch/MovieGenBench" target="_blank" rel="noopener noreferrer">MovieGenBench ↗</a><span>Not a scoreboard — 1,003 prompts with uncurated outputs. Re-judge the claim yourself.</span></li>
+      </ul>
     </div>
     <div class="chiprow" id="famChips" role="group" aria-label="Filter by family">
       <span class="lbl">Family</span>
@@ -733,14 +766,14 @@
   <div class="wrap">
     <h2>Where practitioners actually look</h2>
     <div class="sources">
-      <div class="src"><b>Artificial Analysis — Video Arena</b><span>Live T2V and I2V Elo from blind human votes; the launch-day scoreboard.</span></div>
-      <div class="src"><b>VBench leaderboard (Hugging Face)</b><span>Dimension-level scores for open and some closed models. Read dimensions, not totals.</span></div>
-      <div class="src"><b>VideoPhy-2 &amp; PhyGenBench leaderboards</b><span>The physics scoreboards — where “world model” claims go to be audited.</span></div>
-      <div class="src"><b>Physics-IQ (GitHub)</b><span>DeepMind’s continuation-vs-reality benchmark; code and scenarios public.</span></div>
-      <div class="src"><b>MovieGenBench (Meta)</b><span>1,003 prompts with uncurated outputs from multiple models — re-judge them yourself.</span></div>
+      <div class="src"><b><a href="https://artificialanalysis.ai/video/arena" target="_blank" rel="noopener noreferrer">Artificial Analysis — Video Arena ↗</a></b><span>Live T2V, I2V and video-editing Elo from blind human votes; the launch-day scoreboard.</span></div>
+      <div class="src"><b><a href="https://huggingface.co/spaces/Vchitect/VBench_Leaderboard" target="_blank" rel="noopener noreferrer">VBench leaderboard ↗</a></b><span>Dimension-level scores for open and closed models; hosts the VBench-2.0 board too.</span></div>
+      <div class="src"><b><a href="https://videophy2.github.io/" target="_blank" rel="noopener noreferrer">VideoPhy-2 leaderboard ↗</a></b><span>The physics scoreboard — where “world model” claims go to be audited.</span></div>
+      <div class="src"><b><a href="https://github.com/google-deepmind/physics-IQ-benchmark#leaderboard" target="_blank" rel="noopener noreferrer">Physics-IQ ↗</a></b><span>DeepMind’s continuation-vs-reality benchmark; two leaderboards, code and scenarios public.</span></div>
+      <div class="src"><b><a href="https://github.com/facebookresearch/MovieGenBench" target="_blank" rel="noopener noreferrer">MovieGenBench ↗</a></b><span>1,003 prompts with uncurated outputs from multiple models — re-judge them yourself.</span></div>
       <div class="src"><b>Lab tech reports</b><span>Veo, Seedance, Kling, Wan, LTX — primary numbers. Remember who typeset the table.</span></div>
     </div>
-    <p class="fineprint">Compiled early 2026. Scores are approximate best-reported figures at time of writing; video-gen leaderboards move even faster than LLM ones. The three models on Plates V–VI (Bittern-2, Grebe 1.6, Teal-XL) and their scores are invented to demonstrate table-reading; every benchmark, metric, incident and named model elsewhere is real. Companion page: <a href="../index.html">A Field Guide to LLM Benchmarks</a>.</p>
+    <p class="fineprint">Scores spot-checked against the live leaderboards linked above in July 2026, and they move monthly — the families, the lifecycle and the failure modes age far more slowly than any figure here. The three models on Plates V–VI (Bittern-2, Grebe 1.6, Teal-XL) and their scores are invented to demonstrate table-reading; every benchmark, metric, incident and named model elsewhere is real. Companion page: <a href="../index.html">A Field Guide to LLM Benchmarks</a>.</p>
   </div>
 </footer>
 
@@ -788,12 +821,14 @@ const BENCH = [
     tag:"16 automated dimensions; the VBench total is video gen’s MMLU.",
     how:"Per-dimension prompt suites scored by specialist judges — subject/background consistency, motion smoothness, dynamic degree, aesthetics, prompt-category adherence — rolled into weighted quality and semantic totals. Public Hugging Face leaderboard; variants cover image-to-video and long-form.",
     why:"The first eval that made video models comparable without convening a human panel. Wan 2.1 launched on topping it, nearly every open model reports it, and labs use its dimensions as training dials.",
-    watch:"Totals compress trade-offs — a near-static video aces consistency while flunking dynamic degree (Plate V). Top models now cluster within a couple of points, and its CLIP-and-detector-era judges have documented taste." },
+    watch:"Totals compress trade-offs — a near-static video aces consistency while flunking dynamic degree (Plate V). Top models now cluster within a couple of points, and its CLIP-and-detector-era judges have documented taste.",
+    link:"https://huggingface.co/spaces/Vchitect/VBench_Leaderboard", linkLabel:"Leaderboard" },
   { id:"vbench2", name:"VBench-2.0", year:2025, fam:"suite", status:"frontier", pct:60, score:"≈60",
     tag:"The sequel targets what 1.0 couldn’t see: physics, anatomy, common sense.",
-    how:"Roughly 18 abilities across five categories — human fidelity, controllability, creativity, physics, commonsense — scored by VLM/LLM judge pipelines rather than low-level detectors.",
-    why:"Built because 1.0 was saturating: models render gorgeous frames while hands melt and cups pour upward. Restores headroom exactly where “world model” marketing lives.",
-    watch:"Young: judge pipelines are still being audited, and scores shift when judges upgrade. VLM judges inherit VLM blind spots — verify a delta with your own eyes before believing it." },
+    how:"Roughly 18 abilities across five categories — human fidelity, controllability, creativity, physics, commonsense — scored by VLM/LLM judge pipelines rather than low-level detectors. Scored on the same Hugging Face space as VBench 1.0, under its own tab.",
+    why:"Built because 1.0 was saturating: models render gorgeous frames while hands melt and cups pour upward. Restores headroom exactly where “world model” marketing lives — it now covers Veo, Wan, Seedance, Kling and Vidu.",
+    watch:"Young: judge pipelines are still being audited, and scores shift when judges upgrade. VLM judges inherit VLM blind spots — verify a delta with your own eyes before believing it.",
+    link:"https://huggingface.co/spaces/Vchitect/VBench_Leaderboard", linkLabel:"Leaderboard (VBench-2.0 tab)" },
   { id:"evalcrafter", name:"EvalCrafter", year:2023, fam:"suite", status:"ret", pct:null, score:"17 metrics",
     tag:"700 prompts, 17 metrics, human-aligned weights — the other 2023 suite.",
     how:"Real-user-derived prompts scored on visual quality, text-video alignment, motion and temporal consistency; metric weights regressed against collected human ratings.",
@@ -803,19 +838,22 @@ const BENCH = [
     tag:"Meta’s 1,003 prompts — released with every model’s uncherry-picked outputs.",
     how:"Movie Gen shipped with 1,003 video (and 527 audio) benchmark prompts plus non-curated outputs from Movie Gen and rival models of its era; comparisons are human A/B on quality, motion realness, and alignment.",
     why:"The anti-demo-reel: publishing every output for a fixed prompt set lets anyone re-judge the claim. Later models, open and closed, evaluate against its released videos.",
-    watch:"Human A/B protocols differ between labs even on identical prompts, and “beats Movie Gen (2024)” ages fast as the field moves." },
+    watch:"Human A/B protocols differ between labs even on identical prompts, and “beats Movie Gen (2024)” ages fast as the field moves.",
+    link:"https://github.com/facebookresearch/MovieGenBench", linkLabel:"Prompts & outputs (GitHub)" },
 
   /* ---- Human preference ---- */
   { id:"aaarena", name:"Artificial Analysis Video Arena", year:2024, fam:"pref", status:"work", pct:null, score:"Elo ranking",
     tag:"Blind pairwise human votes across T2V and I2V; the ranking launches quote.",
     how:"Voters see two anonymous generations for the same prompt and pick the better one; Elo-style ratings aggregate thousands of matchups, tracked separately for text-to-video and image-to-video.",
-    why:"The closest thing video gen has to LMArena — independent, ongoing, human. Seedance 1.0’s launch led with debuting #1 across both tracks; Veo and Kling releases cite their standing.",
-    watch:"Preference compresses everything — adherence, aesthetics, motion — into one first-glance vote. The prompt mix skews cinematic; your use case may not." },
+    why:"The closest thing video gen has to LMArena — independent, ongoing, human. Separate boards for text-to-video, image-to-video and video editing; audio is now judged too. Seedance, Veo, Kling, Wan and LTX releases all cite their standing.",
+    watch:"Preference compresses everything — adherence, aesthetics, motion — into one first-glance vote. The prompt mix skews cinematic; your use case may not. Elo is comparable only within one snapshot.",
+    link:"https://artificialanalysis.ai/video/leaderboard/text-to-video", linkLabel:"T2V leaderboard (I2V & editing linked there)" },
   { id:"genaiarena", name:"GenAI-Arena", year:2024, fam:"pref", status:"work", pct:null, score:"Elo ranking",
     tag:"The open, academic arena — image and video, votes public.",
     how:"A Hugging Face arena (TIGER-Lab) running blind pairwise battles for open image and video generators, with vote data released for study.",
     why:"Covers the open models commercial arenas deprioritize, and its auditable votes let researchers study voter behavior itself.",
-    watch:"Far fewer votes than commercial arenas means wide error bars and slow updates; frontier closed models are missing or stale." },
+    watch:"Far fewer votes than commercial arenas means wide error bars and slow updates; frontier closed models are missing or stale. The Space itself is intermittently down — as of this writing it is failing to build.",
+    link:"https://huggingface.co/spaces/TIGER-Lab/GenAI-Arena", linkLabel:"Arena (Space, may be down)" },
   { id:"inhouse", name:"In-house win-rate studies", year:2022, fam:"pref", status:"work", pct:null, score:"win rate %",
     tag:"“Preferred over X 62% of the time” — the launch-day staple.",
     how:"Lab-internal prompt sets, generations from both models, contracted raters picking winners along axes like quality, motion and adherence. Published as bar charts in tech reports — Veo, Kling, Seedance and Wan reports all lean on them.",
@@ -827,7 +865,8 @@ const BENCH = [
     tag:"Compositional prompts video models actually fail: counting, binding, interaction.",
     how:"700 prompts across seven compositional axes — attribute binding (static and changing), spatial relations, motion direction, actions, interactions, numeracy — scored per-axis by MLLM judges, detectors and trackers.",
     why:"Separates “renders a pretty dog” from “renders the red ball LEFT of the blue cube, rolling right.” Exposes adherence gaps that aesthetic-heavy suites hide.",
-    watch:"The judge stack is heavy and each axis has its own failure modes; per-axis gaps between models mean more than absolute numbers." },
+    watch:"The judge stack is heavy and each axis has its own failure modes; per-axis gaps between models mean more than absolute numbers.",
+    link:"https://t2v-compbench.github.io/", linkLabel:"Leaderboard" },
   { id:"geneval", name:"GenEval", year:2023, fam:"fid", status:"sat", pct:92, score:"≈0.92",
     tag:"Detection-checked T2I adherence: objects, counts, colors, positions.",
     how:"Prompts with verifiable content (“two dogs and one cat”); an object detector checks the render. No taste involved — the count is right or it isn’t.",
@@ -845,16 +884,18 @@ const BENCH = [
     watch:"Judge models date quickly — the ++ revision exists because the originals drifted from human ratings. The easy axes are near ceiling." },
 
   /* ---- Physics & world ---- */
-  { id:"physicsiq", name:"Physics-IQ", year:2025, fam:"phys", status:"frontier", pct:25, score:"≈25/100",
-    tag:"Given 3 seconds of real footage, continue it — physics decides the score.",
-    how:"Real filmed scenarios (fluids, collisions, optics, materials); models generate the continuation; scoring compares where, when and how motion unfolds against the real outcome, normalized so paired real videos land near 100.",
+  { id:"physicsiq", name:"Physics-IQ", year:2025, fam:"phys", status:"frontier", pct:58, score:"≈58/100",
+    tag:"Given real footage, continue it — physics decides the score.",
+    how:"396 real filmed scenarios (fluids, collisions, optics, materials); models generate the continuation; scoring compares where, when and how motion unfolds against the real outcome, normalized so paired real videos score 100.",
     why:"DeepMind’s direct audit of the “world model” claim: no prompt taste, no aesthetics — just whether the model’s imagined future matches the actual one. Headline finding: visual realism and physical understanding are nearly uncorrelated.",
-    watch:"Continuation-style eval favors models with strong I2V/V2V modes. Best scores sit around a quarter of the ceiling — expect fast movement and version footnotes." },
-  { id:"videophy2", name:"VideoPhy-2", year:2025, fam:"phys", status:"frontier", pct:30, score:"≈30% joint",
+    watch:"Read which board you’re quoting. The stricter <em>Verified</em> leaderboard tops out near 58 (Magi-1 24B + GeoPhys, multiframe V2V); the original board shows 64.5 for a best-of-N run — sampling many times and keeping the winner is a compute multiplier, not understanding. Continuation-style eval also favors models with strong V2V modes.",
+    link:"https://github.com/google-deepmind/physics-IQ-benchmark#leaderboard", linkLabel:"Leaderboard (GitHub)" },
+  { id:"videophy2", name:"VideoPhy-2", year:2025, fam:"phys", status:"frontier", pct:22, score:"≈22% joint",
     tag:"Does the generated video obey commonsense physics? Mostly, no.",
-    how:"Thousands of action-centric prompts (sports, object interactions); raters and an automatic judge score semantic adherence and physical commonsense jointly, with a hard subset isolating the brutal cases.",
-    why:"The standing physics scoreboard between frontier releases — open leaderboard, harder each version, and the joint metric punishes pretty-but-impossible videos.",
-    watch:"Judging physics from pixels is noisy at the margins, and the automatic judge agrees with humans imperfectly. The hard-subset numbers are the honest ones." },
+    how:"200 actions expanded into thousands of prompts (sports, object interactions); raters and an automatic judge score semantic adherence and physical commonsense jointly, with a hard subset isolating the brutal cases.",
+    why:"The standing physics scoreboard between frontier releases — open leaderboard, and the joint metric punishes pretty-but-impossible videos. Models fail hardest on conservation of mass and momentum.",
+    watch:"The hard-subset numbers are the honest ones, and they are brutal: the leader is the open Wan2.1-14B at ≈22%, with closed models like Sora and Ray2 in single digits. A benchmark where open beats closed is measuring something the arenas don’t.",
+    link:"https://videophy2.github.io/", linkLabel:"Leaderboard" },
   { id:"phygenbench", name:"PhyGenBench", year:2024, fam:"phys", status:"frontier", pct:55, score:"≈0.55 PCScore",
     tag:"27 physical laws, four domains, prompts a high-schooler could verify.",
     how:"160 prompts targeting mechanics, optics, thermal and material properties (“light passing through a prism…”); a staged VLM pipeline checks whether the law actually holds in the output.",
@@ -864,7 +905,8 @@ const BENCH = [
     tag:"One ruler for “world models”: video generators and 3D scene systems alike.",
     how:"Long camera-instructed rollouts through described scenes, scored on controllability (did the camera do what was asked), visual quality, and dynamics — the same protocol applied to video, 3D and 4D generators.",
     why:"Lets the two “world model” communities meet on one leaderboard, and measures camera obedience — a capability arenas barely see.",
-    watch:"Young, and instruction formats favor systems trained for camera control; treat cross-paradigm comparisons as directional, not decisive." },
+    watch:"Young, and instruction formats favor systems trained for camera control; treat cross-paradigm comparisons as directional, not decisive.",
+    link:"https://huggingface.co/spaces/Howieeeee/WorldScore_Leaderboard", linkLabel:"Leaderboard" },
 
   /* ---- Distance metrics ---- */
   { id:"fvd", name:"FVD", year:2018, fam:"dist", status:"ret", pct:null, score:"lower is better",
@@ -1030,6 +1072,7 @@ function cardHTML(b){
           <h4>How it works</h4><p>${b.how}</p>
           <h4>Why labs use it</h4><p>${b.why}</p>
           <h4>Watch out</h4><p>${b.watch}</p>
+          ${b.link ? `<a class="spec-link" href="${b.link}" target="_blank" rel="noopener noreferrer">${b.linkLabel} <span aria-hidden="true">↗</span></a>` : ""}
         </div>
       </div>
     </div>
