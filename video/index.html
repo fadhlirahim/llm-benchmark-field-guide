@@ -1,0 +1,1162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Field Guide to Video-Generation Benchmarks</title>
+<meta name="description" content="How video-generation models — Veo, Seedance, Kling, Wan, LTX — are benchmarked: arenas, VBench, physics tests, and the hazards of grading perception.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
+<style>
+  /* ---------- tokens ---------- */
+  :root {
+    --bg: #eff1e6;
+    --card: #fafbf3;
+    --card2: #e7eadb;
+    --ink: #1e2620;
+    --ink2: #4b544b;
+    --mut: #79816f;
+    --line: #d9dcc8;
+    --acc: #2d6a4f;
+    --acc-ink: #f3f7ee;
+    --acc-soft: rgba(45,106,79,.08);
+    --band: rgba(45,106,79,.07);
+    --shadow: 0 1px 2px rgba(30,38,32,.06), 0 4px 16px rgba(30,38,32,.05);
+
+    --st-frontier: #1f7a3d;
+    --st-work: #2b6777;
+    --st-sat: #a06b00;
+    --st-ret: #9a5b41;
+
+    --f-suite: #2a78d6;
+    --f-fid: #1baf7a;
+    --f-pref: #4a3aa7;
+    --f-phys: #008300;
+    --f-dist: #e34948;
+    --f-img: #eb6834;
+
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --sans: Seravek, "Avenir Next", Avenir, "Gill Sans", "Trebuchet MS", "Segoe UI", sans-serif;
+    --mono: "SF Mono", ui-monospace, Menlo, Consolas, "Cascadia Mono", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f130e;
+      --card: #161b14;
+      --card2: #1e241b;
+      --ink: #e8ecdb;
+      --ink2: #b5bda6;
+      --mut: #848c77;
+      --line: #2b3226;
+      --acc: #83c39a;
+      --acc-ink: #0f130e;
+      --acc-soft: rgba(131,195,154,.10);
+      --band: rgba(131,195,154,.08);
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.3);
+      --st-frontier: #4fb573;
+      --st-work: #5aa7c4;
+      --st-sat: #d9a544;
+      --st-ret: #c98a6b;
+      --f-suite: #3987e5;
+      --f-fid: #199e70;
+      --f-pref: #9085e9;
+      --f-phys: #008300;
+      --f-dist: #e66767;
+      --f-img: #d95926;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f130e;
+    --card: #161b14;
+    --card2: #1e241b;
+    --ink: #e8ecdb;
+    --ink2: #b5bda6;
+    --mut: #848c77;
+    --line: #2b3226;
+    --acc: #83c39a;
+    --acc-ink: #0f130e;
+    --acc-soft: rgba(131,195,154,.10);
+    --band: rgba(131,195,154,.08);
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.3);
+    --st-frontier: #4fb573;
+    --st-work: #5aa7c4;
+    --st-sat: #d9a544;
+    --st-ret: #c98a6b;
+    --f-suite: #3987e5;
+    --f-fid: #199e70;
+    --f-pref: #9085e9;
+    --f-phys: #008300;
+    --f-dist: #e66767;
+    --f-img: #d95926;
+  }
+  :root[data-theme="light"] {
+    --bg: #eff1e6;
+    --card: #fafbf3;
+    --card2: #e7eadb;
+    --ink: #1e2620;
+    --ink2: #4b544b;
+    --mut: #79816f;
+    --line: #d9dcc8;
+    --acc: #2d6a4f;
+    --acc-ink: #f3f7ee;
+    --acc-soft: rgba(45,106,79,.08);
+    --band: rgba(45,106,79,.07);
+    --shadow: 0 1px 2px rgba(30,38,32,.06), 0 4px 16px rgba(30,38,32,.05);
+    --st-frontier: #1f7a3d;
+    --st-work: #2b6777;
+    --st-sat: #a06b00;
+    --st-ret: #9a5b41;
+    --f-suite: #2a78d6;
+    --f-fid: #1baf7a;
+    --f-pref: #4a3aa7;
+    --f-phys: #008300;
+    --f-dist: #e34948;
+    --f-img: #eb6834;
+  }
+
+  /* ---------- base ---------- */
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 20px; }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 600; line-height: 1.2; text-wrap: balance; margin: 0; }
+  p { margin: 0 0 1em; }
+  a { color: var(--acc); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  :focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; border-radius: 2px; }
+  button { font: inherit; color: inherit; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--acc);
+    margin: 0 0 10px;
+  }
+  .lede { color: var(--ink2); max-width: 62ch; }
+
+  /* ---------- top nav ---------- */
+  .topnav {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg) 86%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .topnav-in {
+    max-width: 1060px; margin: 0 auto; padding: 9px 20px;
+    display: flex; align-items: center; gap: 18px;
+  }
+  .topnav .brand {
+    font-family: var(--serif); font-size: 15px; font-weight: 600;
+    white-space: nowrap; color: var(--ink); text-decoration: none;
+  }
+  .topnav ul {
+    display: flex; gap: 2px; list-style: none; margin: 0; padding: 0;
+    overflow-x: auto; scrollbar-width: none; min-width: 0;
+  }
+  .topnav ul::-webkit-scrollbar { display: none; }
+  .topnav ul a {
+    display: block; padding: 4px 10px; border-radius: 999px;
+    font-size: 13px; color: var(--ink2); text-decoration: none; white-space: nowrap;
+  }
+  .topnav ul a:hover { background: var(--acc-soft); color: var(--ink); }
+
+  .theme-toggle {
+    margin-left: auto; flex: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--card);
+    color: var(--ink2); cursor: pointer; padding: 0;
+    transition: border-color .15s, color .15s;
+  }
+  .theme-toggle:hover { border-color: var(--acc); color: var(--ink); }
+  .theme-toggle svg { width: 15px; height: 15px; }
+  .theme-toggle .moon { display: none; }
+  :root[data-theme="dark"] .theme-toggle .moon { display: block; }
+  :root[data-theme="dark"] .theme-toggle .sun { display: none; }
+
+  /* ---------- hero ---------- */
+  .hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--line); }
+  .hero-grid {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      repeating-linear-gradient(to right, var(--line) 0 1px, transparent 1px 48px),
+      repeating-linear-gradient(to bottom, var(--line) 0 1px, transparent 1px 48px);
+    opacity: .35;
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.9), transparent 85%);
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,.9), transparent 85%);
+  }
+  .hero-curves { position: absolute; right: -40px; top: 0; height: 100%; pointer-events: none; opacity: .5; }
+  .hero-in { position: relative; padding: 72px 0 56px; }
+  .hero .stamp {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--mut);
+    display: inline-block; border: 1px solid var(--line); border-radius: 999px;
+    padding: 4px 12px; margin-bottom: 22px; background: var(--card);
+  }
+  .hero h1 { font-size: clamp(34px, 6vw, 58px); font-weight: 600; max-width: 14ch; }
+  .hero h1 em { font-style: italic; color: var(--acc); }
+  .hero .sub {
+    font-family: var(--serif); font-style: italic; font-size: clamp(17px, 2.4vw, 21px);
+    color: var(--ink2); margin: 14px 0 20px; max-width: 44ch;
+  }
+  .hero .lede { margin-bottom: 30px; }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero .rise { opacity: 0; transform: translateY(10px); animation: rise .7s ease forwards; }
+    .hero .rise:nth-child(2) { animation-delay: .08s; }
+    .hero .rise:nth-child(3) { animation-delay: .16s; }
+    .hero .rise:nth-child(4) { animation-delay: .24s; }
+    .hero .rise:nth-child(5) { animation-delay: .32s; }
+    @keyframes rise { to { opacity: 1; transform: none; } }
+  }
+
+  /* status key */
+  .statuskey {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 16px; box-shadow: var(--shadow);
+  }
+  .statuskey .k { display: flex; gap: 10px; align-items: flex-start; }
+  .statuskey .k small { display: block; color: var(--mut); font-size: 12.5px; line-height: 1.45; }
+  .statuskey .k b { font-size: 13px; letter-spacing: .04em; }
+  .keyhead {
+    grid-column: 1 / -1; font-family: var(--mono); font-size: 11px;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--mut);
+    border-bottom: 1px solid var(--line); padding-bottom: 8px;
+  }
+
+  .sdot { width: 10px; height: 10px; border-radius: 50%; flex: none; margin-top: 5px; }
+  .sdot.frontier { background: var(--st-frontier); }
+  .sdot.work { background: var(--st-work); }
+  .sdot.sat { background: var(--st-sat); }
+  .sdot.ret { background: var(--st-ret); }
+
+  /* ---------- plates ---------- */
+  .plate { padding: 64px 0 8px; }
+  .plate-head { margin-bottom: 28px; }
+  .plate-head h2 { font-size: clamp(24px, 3.6vw, 34px); margin-bottom: 10px; }
+
+  /* ---------- why cards ---------- */
+  .whygrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 40px; }
+  .why {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 20px; box-shadow: var(--shadow);
+  }
+  .why h3 { font-size: 19px; margin-bottom: 8px; }
+  .why p { color: var(--ink2); font-size: 14.5px; margin: 0; }
+  .why .glyph { font-family: var(--mono); color: var(--acc); font-size: 12px; letter-spacing: .12em; display: block; margin-bottom: 10px; }
+
+  /* ---------- cast ---------- */
+  .castgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; margin-bottom: 40px; }
+  .cast {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 18px 20px; box-shadow: var(--shadow);
+  }
+  .cast h3 { font-size: 19px; margin-bottom: 3px; }
+  .cast .meta { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--mut); display: block; margin-bottom: 9px; }
+  .cast .meta b { color: var(--acc); font-weight: 600; }
+  .cast p { font-size: 13.5px; color: var(--ink2); margin: 0; }
+
+  /* ---------- lifecycle ---------- */
+  .cycle {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    box-shadow: var(--shadow); padding: 22px; margin-bottom: 40px;
+  }
+  .stages { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .stage {
+    border: 1px solid var(--line); background: var(--card2); border-radius: 999px;
+    padding: 6px 14px; font-size: 13.5px; cursor: pointer; color: var(--ink2);
+    transition: background .18s, color .18s, border-color .18s;
+  }
+  .stage[aria-pressed="true"] { background: var(--acc); color: var(--acc-ink); border-color: var(--acc); }
+  .stage .n { font-family: var(--mono); font-size: 11px; opacity: .7; margin-right: 5px; }
+  .cycle-body { display: grid; grid-template-columns: 1.15fr 1fr; gap: 24px; align-items: center; }
+  @media (max-width: 760px) { .cycle-body { grid-template-columns: 1fr; } }
+  .cycle-viz { position: relative; }
+  .cycle-viz svg { display: block; width: 100%; height: auto; }
+  .cycle-dot {
+    position: absolute; width: 16px; height: 16px; border-radius: 50%;
+    background: var(--acc); border: 3px solid var(--card);
+    box-shadow: 0 0 0 1px var(--line);
+    transform: translate(-50%, -50%);
+    transition: left .5s cubic-bezier(.4,0,.2,1), top .5s cubic-bezier(.4,0,.2,1);
+  }
+  .stage-note h3 { font-size: 20px; margin-bottom: 8px; }
+  .stage-note .years { font-family: var(--mono); font-size: 12px; color: var(--mut); display: block; margin-bottom: 8px; }
+  .stage-note p { color: var(--ink2); font-size: 14.5px; }
+  .stage-note .case {
+    border-left: 3px solid var(--acc); background: var(--acc-soft);
+    padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: 13.5px; color: var(--ink2); margin: 0;
+  }
+  .stage-note .case b { color: var(--ink); }
+
+  /* ---------- filters + specimen cards ---------- */
+  .chiprow { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; align-items: center; }
+  .chiprow .lbl { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--mut); margin-right: 4px; min-width: 56px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    border: 1px solid var(--line); background: var(--card); border-radius: 999px;
+    padding: 5px 13px; font-size: 13px; cursor: pointer; color: var(--ink2);
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  .chip:hover { border-color: var(--acc); }
+  .chip[aria-pressed="true"] { background: var(--acc); border-color: var(--acc); color: var(--acc-ink); }
+  .chip .fdot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+  .chip[aria-pressed="true"] .fdot { box-shadow: 0 0 0 1.5px var(--acc-ink); }
+  .count { font-family: var(--mono); font-size: 12px; color: var(--mut); margin: 6px 0 18px; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 14px; margin-bottom: 40px; }
+  .spec {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    box-shadow: var(--shadow); overflow: hidden;
+    transition: border-color .18s;
+  }
+  .spec:hover { border-color: color-mix(in srgb, var(--acc) 45%, var(--line)); }
+  .spec-head {
+    display: block; width: 100%; text-align: left; background: none; border: 0;
+    padding: 16px 16px 14px; cursor: pointer;
+  }
+  .spec-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .fam-tag { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--mut); }
+  .fam-tag .fdot { width: 8px; height: 8px; border-radius: 50%; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--ink2); border: 1px solid var(--line); border-radius: 999px; padding: 2.5px 9px;
+    white-space: nowrap;
+  }
+  .badge i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  .spec h3 { font-size: 20px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .spec h3 .yr { font-family: var(--mono); font-size: 11.5px; color: var(--mut); font-weight: 400; }
+  .spec .tag { color: var(--ink2); font-size: 13.5px; margin: 5px 0 12px; line-height: 1.5; }
+  .meter-row { display: flex; align-items: center; gap: 10px; }
+  .track { flex: 1; height: 6px; border-radius: 999px; background: var(--card2); overflow: hidden; }
+  .fill { height: 100%; border-radius: 999px; }
+  .meter-val { font-family: var(--mono); font-size: 12px; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .meter-cap { font-family: var(--mono); font-size: 10px; color: var(--mut); margin-top: 5px; letter-spacing: .05em; }
+  .chev { margin-left: auto; color: var(--mut); transition: transform .25s; font-size: 12px; margin-top: 2px; }
+  .spec.open .chev { transform: rotate(180deg); }
+  .spec-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s ease; }
+  .spec.open .spec-body { grid-template-rows: 1fr; }
+  .spec-body-in { overflow: hidden; }
+  .spec-body-pad { padding: 2px 16px 18px; border-top: 1px dashed var(--line); margin: 0 0; }
+  .spec-body h4 {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--acc); margin: 14px 0 4px; font-weight: 600;
+  }
+  .spec-body p { font-size: 13.5px; color: var(--ink2); margin: 0; line-height: 1.55; }
+  .empty { color: var(--mut); font-style: italic; padding: 30px 4px; grid-column: 1 / -1; text-align: center; }
+
+  /* ---------- dimension chart ---------- */
+  .dimchart {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    box-shadow: var(--shadow); padding: 22px; margin-bottom: 14px;
+  }
+  .dimlegend { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 4px; }
+  .dimlegend span { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink2); }
+  .dimlegend .fdot { width: 10px; height: 10px; border-radius: 50%; }
+  .dimweights { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0 20px; }
+  .dimweights .lbl { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--mut); margin-right: 4px; }
+  .dimrow { display: grid; grid-template-columns: 170px 1fr; gap: 14px; align-items: center; padding: 7px 0; }
+  @media (max-width: 620px) { .dimrow { grid-template-columns: 1fr; gap: 4px; } }
+  .dimrow .dname { font-size: 13.5px; color: var(--ink2); }
+  .dimrow.total { border-top: 1px dashed var(--line); margin-top: 10px; padding-top: 14px; }
+  .dimrow.total .dname { font-weight: 600; color: var(--ink); }
+  .dbars { display: flex; flex-direction: column; gap: 2px; }
+  .dbarrow { display: flex; align-items: center; gap: 9px; }
+  .dtrack { flex: 1; height: 13px; background: var(--card2); border-radius: 0 4px 4px 0; overflow: hidden; }
+  .dimrow.total .dtrack { height: 17px; }
+  .dfill { height: 100%; border-radius: 0 4px 4px 0; transition: width .5s cubic-bezier(.4,0,.2,1); }
+  .dval { font-family: var(--mono); font-size: 11.5px; color: var(--ink); font-variant-numeric: tabular-nums; min-width: 42px; text-align: right; }
+  .dimverdict { font-family: var(--mono); font-size: 12.5px; color: var(--acc); margin: 16px 0 0; }
+  .chart-note { font-size: 12.5px; color: var(--mut); margin-bottom: 40px; }
+
+  /* ---------- reading a launch table ---------- */
+  .boardwrap { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 16px; }
+  table.board { border-collapse: collapse; width: 100%; min-width: 720px; font-size: 13.5px; }
+  table.board caption {
+    text-align: left; font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--mut); padding: 14px 16px 6px;
+  }
+  table.board th, table.board td { padding: 10px 16px; text-align: right; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+  table.board th { font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--ink2); letter-spacing: .03em; }
+  table.board td:first-child, table.board th:first-child { text-align: left; }
+  table.board td:first-child { font-weight: 600; }
+  table.board .best { color: var(--acc); font-weight: 700; }
+  .term {
+    text-decoration: underline dotted var(--mut) 1.5px; text-underline-offset: 3px;
+    cursor: help; position: relative;
+  }
+  .term::after {
+    content: attr(data-tip);
+    position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%);
+    width: max-content; max-width: 250px; white-space: normal;
+    background: var(--ink); color: var(--bg); text-align: left;
+    font-family: var(--sans); font-size: 12px; font-weight: 400; line-height: 1.45;
+    letter-spacing: 0; text-transform: none;
+    padding: 8px 11px; border-radius: 8px;
+    opacity: 0; pointer-events: none; transition: opacity .15s; z-index: 60;
+  }
+  .term:hover::after, .term:focus-visible::after { opacity: 1; }
+  th .term::after { right: 0; left: auto; transform: none; }
+  .decoder { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px 22px; margin-bottom: 18px; }
+  .decoder div { font-size: 13.5px; color: var(--ink2); border-left: 3px solid var(--card2); padding-left: 12px; }
+  .decoder b.dt { font-family: var(--mono); font-size: 12px; color: var(--ink); display: block; margin-bottom: 2px; }
+  .callout {
+    border: 1px solid var(--line); border-left: 4px solid var(--st-sat);
+    background: var(--card); border-radius: 8px; padding: 14px 18px;
+    font-size: 14px; color: var(--ink2); margin-bottom: 40px;
+  }
+  .callout b { color: var(--ink); }
+
+  /* ---------- hazards ---------- */
+  .hazards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; margin-bottom: 40px; }
+  .haz { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; box-shadow: var(--shadow); }
+  .haz h3 { font-size: 18px; margin-bottom: 7px; }
+  .haz p { font-size: 13.5px; color: var(--ink2); margin-bottom: 10px; }
+  .haz .case { font-size: 12.5px; color: var(--mut); border-top: 1px dashed var(--line); padding-top: 9px; margin: 0; }
+  .haz .case b { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--st-sat); display: block; margin-bottom: 3px; }
+
+  /* ---------- chooser ---------- */
+  .goalchips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .goalpanel {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    box-shadow: var(--shadow); padding: 22px; margin-bottom: 40px;
+  }
+  .goalpanel .picks { display: grid; gap: 12px; margin: 0 0 14px; }
+  .pick { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: baseline; }
+  .pick .pname { font-family: var(--mono); font-size: 13px; color: var(--ink); background: var(--acc-soft); border: 1px solid color-mix(in srgb, var(--acc) 30%, transparent); border-radius: 6px; padding: 2px 9px; white-space: nowrap; }
+  .pick .pwhy { font-size: 13.5px; color: var(--ink2); }
+  .goalpanel .caveat { font-size: 13px; color: var(--mut); border-top: 1px dashed var(--line); padding-top: 12px; margin: 0; }
+  .goalpanel .caveat b { color: var(--st-sat); font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; margin-right: 6px; }
+
+  /* ---------- footer ---------- */
+  .colophon { border-top: 1px solid var(--line); margin-top: 30px; padding: 44px 0 60px; }
+  .colophon h2 { font-size: 22px; margin-bottom: 14px; }
+  .sources { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 26px; }
+  .src { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; }
+  .src b { display: block; margin-bottom: 2px; }
+  .src span { color: var(--mut); font-size: 12.5px; }
+  .fineprint { font-size: 12.5px; color: var(--mut); max-width: 70ch; }
+</style>
+</head>
+<body>
+<script>
+  (function () {
+    let stored = null;
+    try { stored = localStorage.getItem("fg-theme"); } catch (e) {}
+    const dark = stored ? stored === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    document.documentElement.dataset.theme = dark ? "dark" : "light";
+  })();
+</script>
+
+<!-- ============ NAV ============ -->
+<nav class="topnav" aria-label="Sections">
+  <div class="topnav-in">
+    <a class="brand" href="#top">Field Guide · Video</a>
+    <ul>
+      <li><a href="#why">Why</a></li>
+      <li><a href="#cast">The cast</a></li>
+      <li><a href="#lifecycle">Lifecycle</a></li>
+      <li><a href="#collection">The collection</a></li>
+      <li><a href="#dimensions">Dimensions</a></li>
+      <li><a href="#reading">Reading scores</a></li>
+      <li><a href="#hazards">Hazards</a></li>
+      <li><a href="#chooser">Chooser</a></li>
+      <li><a href="../index.html">LLM guide ↗</a></li>
+    </ul>
+    <button class="theme-toggle" id="themeToggle" type="button">
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>
+      </svg>
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>
+      </svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+  <div class="hero-grid"></div>
+  <svg class="hero-curves" width="520" height="420" viewBox="0 0 520 420" aria-hidden="true">
+    <path d="M0,400 C160,395 210,330 300,240 C380,160 430,100 520,80" fill="none" stroke="var(--acc)" stroke-width="2" opacity=".55"/>
+    <path d="M40,405 C200,400 260,360 340,300 C420,240 470,200 520,180" fill="none" stroke="var(--f-suite)" stroke-width="1.5" opacity=".35"/>
+    <path d="M120,408 C280,404 330,390 400,360 C460,335 495,320 520,310" fill="none" stroke="var(--st-sat)" stroke-width="1.5" opacity=".35"/>
+    <circle cx="300" cy="240" r="4" fill="var(--acc)" opacity=".6"/>
+    <circle cx="340" cy="300" r="3.5" fill="var(--f-suite)" opacity=".45"/>
+  </svg>
+  <div class="wrap hero-in">
+    <span class="stamp rise">Field data compiled early 2026 · scores approximate</span>
+    <h1 class="rise">A Field Guide to <em>Video-Gen Benchmarks</em></h1>
+    <p class="sub rise">How Veo, Seedance, Kling, Wan and LTX get ranked — and why every demo reel is also a benchmark claim.</p>
+    <p class="lede rise">Every video-model launch arrives with the same three artifacts: a demo reel, a bar chart of human win rates, and an arena ranking. Unlike an LLM’s math score, none of them can be checked against an answer key — there is no ground truth for “a beautiful shot of a heron at dawn.” So the field grades <strong>perception itself</strong>, with proxy metrics, machine judges and human votes, each gameable in its own way. This guide catalogues the instruments and how to read them. (Companion: <a href="../index.html">the LLM benchmarks guide</a>.)</p>
+    <div class="statuskey rise" role="img" aria-label="Status key: frontier, workhorse, saturating, saturated">
+      <div class="keyhead">Conservation status — how a benchmark ages</div>
+      <div class="k"><span class="sdot frontier"></span><div><b>FRONTIER</b><small>Big headroom. Where the real competition between top labs happens now.</small></div></div>
+      <div class="k"><span class="sdot work"></span><div><b>WORKHORSE</b><small>The current standards — quoted in every tech report and launch post.</small></div></div>
+      <div class="k"><span class="sdot sat"></span><div><b>SATURATING</b><small>Top models cluster near the ceiling; differences fall inside the noise.</small></div></div>
+      <div class="k"><span class="sdot ret"></span><div><b>SATURATED</b><small>Gamed or outgrown. Survives in academic papers and history sections.</small></div></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ WHY ============ -->
+  <section class="plate" id="why">
+    <div class="plate-head">
+      <p class="eyebrow">Plate I — Why video is different</p>
+      <h2>Grading taste at scale</h2>
+      <p class="lede">LLM benchmarks can check an answer. Video benchmarks must grade perception — which forces every eval into one of three shapes, and each shape fails differently.</p>
+    </div>
+    <div class="whygrid">
+      <div class="why">
+        <span class="glyph">01 · NO ANSWER KEY</span>
+        <h3>Perception is the ground truth</h3>
+        <p>A math benchmark checks the final number; “does this clip look right” has no such check. Every video eval is therefore a proxy metric (FVD), a machine judge (VBench, VQA scorers), or a human vote (arenas, panels) — three approximations of an eye, all foolable.</p>
+      </div>
+      <div class="why">
+        <span class="glyph">02 · MACHINE JUDGES</span>
+        <h3>Models grading models</h3>
+        <p>Automated judges make evaluation scalable: detectors count objects, CLIP checks alignment, aesthetic models score beauty. But a judge’s taste becomes the target — train against it and you inherit its blind spots along with its approval. The judge is part of the experiment.</p>
+      </div>
+      <div class="why">
+        <span class="glyph">03 · THE DEMO ECONOMY</span>
+        <h3>The reel is a benchmark claim</h3>
+        <p>Launch reels move markets more than tables do — and a reel is an eval with n = 12 cherry-picked samples. The serious instruments (arenas, fixed-prompt suites, uncurated releases like MovieGenBench) exist largely as antidotes to the demo economy.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CAST ============ -->
+  <section class="plate" id="cast">
+    <div class="plate-head">
+      <p class="eyebrow">Plate II — The subjects under study</p>
+      <h2>The models these instruments measure</h2>
+      <p class="lede">The frontier as of early 2026 — and how each presents its numbers.</p>
+    </div>
+    <div class="castgrid">
+      <div class="cast"><h3>Veo 3.x</h3><span class="meta">Google DeepMind · <b>closed</b> (Gemini API / Flow)</span><p>Native audio + video. Markets with human side-by-sides, arena standings and filmmaker demos; a fixture near the top of preference rankings at each release.</p></div>
+      <div class="cast"><h3>Sora 2</h3><span class="meta">OpenAI · <b>closed</b> (app / API)</span><p>Made “world simulator” the sales pitch. The physics benchmarks in this guide exist partly to audit exactly that claim.</p></div>
+      <div class="cast"><h3>Seedance 1.x</h3><span class="meta">ByteDance · <b>closed</b> (Volcano Engine API)</span><p>Debuted at #1 on Artificial Analysis’ text-to-video and image-to-video arenas; emphasizes multi-shot narrative generation.</p></div>
+      <div class="cast"><h3>Kling 2.x</h3><span class="meta">Kuaishou · <b>closed</b> (app / API)</span><p>Arena mainstay with an enormous creator base; strong image-to-video and motion controls. Launch posts lean on win-rate studies and arena Elo.</p></div>
+      <div class="cast"><h3>Wan 2.x</h3><span class="meta">Alibaba · <b>open weights</b> (Apache-2.0)</span><p>Topped VBench at release; the open ecosystem’s reference model and the baseline every open-video paper compares against. (Wan 2.5 adds audio, closed-first.)</p></div>
+      <div class="cast"><h3>LTX / LTX-2</h3><span class="meta">Lightricks · <b>open weights</b></span><p>Competes on latency and cost as much as quality — near-real-time generation on accessible hardware. The efficiency baseline other releases quote.</p></div>
+    </div>
+  </section>
+
+  <!-- ============ LIFECYCLE ============ -->
+  <section class="plate" id="lifecycle">
+    <div class="plate-head">
+      <p class="eyebrow">Plate III — The life of a benchmark</p>
+      <h2>Same curve, faster clock</h2>
+      <p class="lede">Video benchmarks age like LLM benchmarks — introduced hard, farmed for progress, then outgrown — but the field is younger and the churn faster. Click through the stages; the worked example is FVD, the metric that ruled video generation for five years.</p>
+    </div>
+    <div class="cycle">
+      <div class="stages" role="group" aria-label="Lifecycle stages">
+        <button class="stage" data-stage="0" aria-pressed="true"><span class="n">1</span>Introduced</button>
+        <button class="stage" data-stage="1" aria-pressed="false"><span class="n">2</span>Discriminative</button>
+        <button class="stage" data-stage="2" aria-pressed="false"><span class="n">3</span>Saturating</button>
+        <button class="stage" data-stage="3" aria-pressed="false"><span class="n">4</span>Retired</button>
+      </div>
+      <div class="cycle-body">
+        <div class="cycle-viz">
+          <svg viewBox="0 0 600 230" aria-hidden="true">
+            <line x1="36" y1="200" x2="580" y2="200" stroke="var(--line)" stroke-width="1"/>
+            <line x1="36" y1="200" x2="36" y2="16" stroke="var(--line)" stroke-width="1"/>
+            <rect x="36" y="16" width="544" height="26" fill="var(--band)"/>
+            <text x="44" y="33" font-family="var(--mono)" font-size="9" fill="var(--mut)" letter-spacing="1">SATURATION ZONE</text>
+            <path d="M 60,192 C 170,188 210,160 295,112 C 370,70 430,40 555,30" fill="none" stroke="var(--acc)" stroke-width="2.5" stroke-linecap="round"/>
+            <text x="560" y="215" font-family="var(--mono)" font-size="9" fill="var(--mut)" text-anchor="end">time since release →</text>
+            <text x="14" y="110" font-family="var(--mono)" font-size="9" fill="var(--mut)" transform="rotate(-90 14 110)" text-anchor="middle">state of the art</text>
+          </svg>
+          <div class="cycle-dot" id="cycleDot" style="left:11%; top:83%"></div>
+        </div>
+        <div class="stage-note" id="stageNote" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COLLECTION ============ -->
+  <section class="plate" id="collection">
+    <div class="plate-head">
+      <p class="eyebrow">Plate IV — The collection</p>
+      <h2>22 specimens, 6 families</h2>
+      <p class="lede">The benchmarks and metrics you’ll meet in video and image model reports. Filter by family or status; click any specimen for how it works, why labs reach for it, and what to distrust. Meters show the approximate top reported score — a short bar means headroom.</p>
+    </div>
+    <div class="chiprow" id="famChips" role="group" aria-label="Filter by family">
+      <span class="lbl">Family</span>
+    </div>
+    <div class="chiprow" id="statusChips" role="group" aria-label="Filter by status">
+      <span class="lbl">Status</span>
+    </div>
+    <p class="count" id="countLine"></p>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <!-- ============ DIMENSIONS ============ -->
+  <section class="plate" id="dimensions">
+    <div class="plate-head">
+      <p class="eyebrow">Plate V — Reading dimensions, not totals</p>
+      <h2>The static-video trick</h2>
+      <p class="lede">Two illustrative model profiles under a VBench-style weighted total. “Grebe 1.6” generates near-static footage: consistency and smoothness soar, motion collapses — and the headline total barely notices. This is why researchers read the dimension table, and why VBench has a dynamic-degree dimension at all. Try re-weighting.</p>
+    </div>
+    <div class="dimchart">
+      <div class="dimlegend">
+        <span><span class="fdot" style="background:var(--f-suite)"></span>Bittern-2 (motion-rich)</span>
+        <span><span class="fdot" style="background:var(--f-img)"></span>Grebe 1.6 (near-static)</span>
+      </div>
+      <div class="dimweights" role="group" aria-label="Total weighting">
+        <span class="lbl">Weights</span>
+        <button class="chip" id="wDefault" aria-pressed="true">VBench-style (motion weighted low)</button>
+        <button class="chip" id="wMotion" aria-pressed="false">Motion-first</button>
+      </div>
+      <div id="dimRows"></div>
+      <p class="dimverdict" id="dimVerdict"></p>
+    </div>
+    <p class="chart-note">Profiles and weights are illustrative, built to mirror a documented pattern: consistency and smoothness judges reward videos where little happens, so suite totals can favor the more static model. Real VBench totals cluster within ~2 points at the top while dynamic degree spreads by 30+.</p>
+  </section>
+
+  <!-- ============ READING ============ -->
+  <section class="plate" id="reading">
+    <div class="plate-head">
+      <p class="eyebrow">Plate VI — Reading a launch table</p>
+      <h2>The fine print is the result</h2>
+      <p class="lede">A fictional launch comparison, typeset the way video labs actually publish them. Hover the dotted terms — each footnote changes what its number means.</p>
+    </div>
+
+    <div class="boardwrap">
+      <table class="board">
+        <caption>Specimen launch table — models are fictional, formats are not</caption>
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th><span class="term" tabindex="0" data-tip="Elo-style rating from blind pairwise human votes (Artificial Analysis-style arena). Only comparable within one leaderboard snapshot — it drifts as the model pool changes.">Arena Elo</span></th>
+            <th>VBench <span class="term" tabindex="0" data-tip="Weighted sum of 16 dimension scores. Totals compress trade-offs — always open the dimension table (see Plate V).">(total)</span></th>
+            <th><span class="term" tabindex="0" data-tip="VBench's motion-amount dimension. It exists because consistency judges reward near-static video. High total + low dynamic degree = the static trick.">Dynamic degree</span></th>
+            <th>VideoPhy-2 <span class="term" tabindex="0" data-tip="Joint score: the video must match the prompt AND obey physical commonsense, on the hard subset. Humans clear 90%; models don't.">(hard, joint)</span></th>
+            <th><span class="term" tabindex="0" data-tip="Internal study: prompt set, raters, sample size and the rival's version are all chosen by the lab reporting the win.">Win rate‡</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Bittern-2</td><td class="best">1287</td><td>87.5</td><td>71.2</td><td class="best">24.1%</td><td class="best">68%</td></tr>
+          <tr><td>Grebe 1.6</td><td>1274</td><td class="best">89.1</td><td>43.5</td><td>19.8%</td><td>61%</td></tr>
+          <tr><td>Teal-XL</td><td>1191</td><td>84.0</td><td class="best">77.9</td><td>12.3%</td><td>44%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="decoder">
+      <div><b class="dt">Elo / win rate</b>Preference, not correctness. A model can climb by being prettier at first glance; adherence and physics ride in the back seat.</div>
+      <div><b class="dt">T2V vs I2V</b>Text-to-video and image-to-video are different tasks with separate leaderboards. A model can lead one and trail the other — a headline that conflates them is a tell.</div>
+      <div><b class="dt">Dynamic degree</b>How much anything actually moves. Read it alongside consistency scores: the pair exposes static-video gaming that either number alone hides.</div>
+      <div><b class="dt">Joint scores (SA + PC)</b>VideoPhy-style: a video counts only if it both matches the prompt and obeys physics. Passing either alone is easy; the conjunction is the benchmark.</div>
+      <div><b class="dt">FVD — lower is better</b>A distance, not a score, and it swings with frame count, resolution and reference split. Compare only within a single eval pipeline.</div>
+      <div><b class="dt">The clip’s fine print</b>720p·5s silent T2V and 1080p·10s multi-shot with audio are different sports. Also ask: was an upscaler or a hidden prompt-rewriter in the pipeline?</div>
+    </div>
+
+    <div class="callout">
+      <b>The demo-reel gotcha:</b> a launch reel is an eval with a dozen hand-picked samples and no denominator. If a capability matters to you, find it in a fixed-prompt, uncurated comparison — or generate 50 videos yourself and count.
+    </div>
+  </section>
+
+  <!-- ============ HAZARDS ============ -->
+  <section class="plate" id="hazards">
+    <div class="plate-head">
+      <p class="eyebrow">Plate VII — Field hazards</p>
+      <h2>Six ways a video-gen number lies</h2>
+      <p class="lede">Every one of these has already bent a headline claim you’ve probably seen.</p>
+    </div>
+    <div class="hazards">
+      <div class="haz">
+        <h3>The static-video trick</h3>
+        <p>Consistency and smoothness judges reward videos where nothing happens. A model can climb suite totals by moving less — beautiful stills gently drifting.</p>
+        <p class="case"><b>Field case</b>VBench added a dynamic-degree dimension specifically to catch this; read it next to consistency, never separately.</p>
+      </div>
+      <div class="haz">
+        <h3>Cherry-picking</h3>
+        <p>Generation is stochastic: one prompt, twenty tries, one masterpiece. Demo reels and paper figures show the best draw; you will get the median one.</p>
+        <p class="case"><b>Field case</b>Meta’s MovieGenBench released every output, uncurated, for 1,003 fixed prompts — the deliberate antidote, and still the exception rather than the rule.</p>
+      </div>
+      <div class="haz">
+        <h3>Metric–eye divergence</h3>
+        <p>FVD is dominated by per-frame appearance and largely blind to temporal nonsense; two videos with identical frames in scrambled order can score nearly alike.</p>
+        <p class="case"><b>Field case</b>A 2024 content-bias study showed FVD barely reacts to temporal corruptions humans spot instantly; JEDi was proposed the same year to replace its features.</p>
+      </div>
+      <div class="haz">
+        <h3>Reward-hacking the judges</h3>
+        <p>Aesthetic and preference models are used as RL training targets. Optimize against a taste model and you get its taste: glossy, high-contrast, centered — the “AI look.”</p>
+        <p class="case"><b>Field case</b>Much of the visual sameness across image models traces to shared preference judges (HPS-style reward models) in their post-training loops.</p>
+      </div>
+      <div class="haz">
+        <h3>Unreproducible human evals</h3>
+        <p>In-house win rates ship with launch posts: internal prompts, unnamed raters, unstated sample sizes, and the rival’s version chosen by the winner.</p>
+        <p class="case"><b>Field case</b>When two competing launches each claim a &gt;60% win rate over the other — and they have — at least one methodology is doing heavy lifting.</p>
+      </div>
+      <div class="haz">
+        <h3>Moving task definitions</h3>
+        <p>Resolution, duration, audio, shot count and hidden prompt-rewriting all change the task. Scores from different configs get quoted side by side as if comparable.</p>
+        <p class="case"><b>Field case</b>A 5-second 720p clip and a 10-second 1080p multi-shot clip with synced audio are different benchmarks wearing the same name — check the config table before the score table.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CHOOSER ============ -->
+  <section class="plate" id="chooser">
+    <div class="plate-head">
+      <p class="eyebrow">Plate VIII — Choosing your instrument</p>
+      <h2>“I want to measure…”</h2>
+      <p class="lede">What a practitioner would actually reach for in early 2026, by goal — with the caveat they’d mutter while doing it.</p>
+    </div>
+    <div class="goalchips" id="goalChips" role="group" aria-label="Choose an evaluation goal"></div>
+    <div class="goalpanel" id="goalPanel" aria-live="polite"></div>
+  </section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="colophon">
+  <div class="wrap">
+    <h2>Where practitioners actually look</h2>
+    <div class="sources">
+      <div class="src"><b>Artificial Analysis — Video Arena</b><span>Live T2V and I2V Elo from blind human votes; the launch-day scoreboard.</span></div>
+      <div class="src"><b>VBench leaderboard (Hugging Face)</b><span>Dimension-level scores for open and some closed models. Read dimensions, not totals.</span></div>
+      <div class="src"><b>VideoPhy-2 &amp; PhyGenBench leaderboards</b><span>The physics scoreboards — where “world model” claims go to be audited.</span></div>
+      <div class="src"><b>Physics-IQ (GitHub)</b><span>DeepMind’s continuation-vs-reality benchmark; code and scenarios public.</span></div>
+      <div class="src"><b>MovieGenBench (Meta)</b><span>1,003 prompts with uncurated outputs from multiple models — re-judge them yourself.</span></div>
+      <div class="src"><b>Lab tech reports</b><span>Veo, Seedance, Kling, Wan, LTX — primary numbers. Remember who typeset the table.</span></div>
+    </div>
+    <p class="fineprint">Compiled early 2026. Scores are approximate best-reported figures at time of writing; video-gen leaderboards move even faster than LLM ones. The three models on Plates V–VI (Bittern-2, Grebe 1.6, Teal-XL) and their scores are invented to demonstrate table-reading; every benchmark, metric, incident and named model elsewhere is real. Companion page: <a href="../index.html">A Field Guide to LLM Benchmarks</a>.</p>
+  </div>
+</footer>
+
+<script>
+/* ================= THEME TOGGLE ================= */
+(function(){
+  const root = document.documentElement;
+  const btn = document.getElementById("themeToggle");
+  const mq = matchMedia("(prefers-color-scheme: dark)");
+  const read = () => { try { return localStorage.getItem("fg-theme"); } catch (e) { return null; } };
+  function apply(theme){
+    root.dataset.theme = theme;
+    const next = theme === "dark" ? "light" : "dark";
+    btn.setAttribute("aria-label", `Switch to ${next} theme`);
+    btn.title = `Switch to ${next} theme`;
+  }
+  apply(root.dataset.theme || (mq.matches ? "dark" : "light"));
+  mq.addEventListener("change", e => { if (!read()) apply(e.matches ? "dark" : "light"); });
+  btn.addEventListener("click", () => {
+    const next = root.dataset.theme === "dark" ? "light" : "dark";
+    try { localStorage.setItem("fg-theme", next); } catch (e) {}
+    apply(next);
+  });
+})();
+
+/* ================= DATA ================= */
+const FAMS = {
+  suite: { name: "Holistic Suites",      color: "var(--f-suite)" },
+  pref:  { name: "Human Preference",     color: "var(--f-pref)" },
+  fid:   { name: "Prompt Fidelity",      color: "var(--f-fid)" },
+  phys:  { name: "Physics & World",      color: "var(--f-phys)" },
+  dist:  { name: "Distance Metrics",     color: "var(--f-dist)" },
+  img:   { name: "Image-Side Staples",   color: "var(--f-img)" },
+};
+const STATUSES = {
+  frontier: { name: "Frontier",   color: "var(--st-frontier)" },
+  work:     { name: "Workhorse",  color: "var(--st-work)" },
+  sat:      { name: "Saturating", color: "var(--st-sat)" },
+  ret:      { name: "Saturated",  color: "var(--st-ret)" },
+};
+
+const BENCH = [
+  /* ---- Holistic suites ---- */
+  { id:"vbench", name:"VBench", year:2023, fam:"suite", status:"sat", pct:86, score:"≈86 total",
+    tag:"16 automated dimensions; the VBench total is video gen’s MMLU.",
+    how:"Per-dimension prompt suites scored by specialist judges — subject/background consistency, motion smoothness, dynamic degree, aesthetics, prompt-category adherence — rolled into weighted quality and semantic totals. Public Hugging Face leaderboard; variants cover image-to-video and long-form.",
+    why:"The first eval that made video models comparable without convening a human panel. Wan 2.1 launched on topping it, nearly every open model reports it, and labs use its dimensions as training dials.",
+    watch:"Totals compress trade-offs — a near-static video aces consistency while flunking dynamic degree (Plate V). Top models now cluster within a couple of points, and its CLIP-and-detector-era judges have documented taste." },
+  { id:"vbench2", name:"VBench-2.0", year:2025, fam:"suite", status:"frontier", pct:60, score:"≈60",
+    tag:"The sequel targets what 1.0 couldn’t see: physics, anatomy, common sense.",
+    how:"Roughly 18 abilities across five categories — human fidelity, controllability, creativity, physics, commonsense — scored by VLM/LLM judge pipelines rather than low-level detectors.",
+    why:"Built because 1.0 was saturating: models render gorgeous frames while hands melt and cups pour upward. Restores headroom exactly where “world model” marketing lives.",
+    watch:"Young: judge pipelines are still being audited, and scores shift when judges upgrade. VLM judges inherit VLM blind spots — verify a delta with your own eyes before believing it." },
+  { id:"evalcrafter", name:"EvalCrafter", year:2023, fam:"suite", status:"ret", pct:null, score:"17 metrics",
+    tag:"700 prompts, 17 metrics, human-aligned weights — the other 2023 suite.",
+    how:"Real-user-derived prompts scored on visual quality, text-video alignment, motion and temporal consistency; metric weights regressed against collected human ratings.",
+    why:"Proved suite-style evaluation could track human judgment, and its prompt list still circulates inside labs.",
+    watch:"Lost the standards war to VBench — few frontier reports cite it now. A reminder that benchmarks compete on adoption, not correctness." },
+  { id:"moviegenbench", name:"MovieGenBench", year:2024, fam:"suite", status:"work", pct:null, score:"human A/B",
+    tag:"Meta’s 1,003 prompts — released with every model’s uncherry-picked outputs.",
+    how:"Movie Gen shipped with 1,003 video (and 527 audio) benchmark prompts plus non-curated outputs from Movie Gen and rival models of its era; comparisons are human A/B on quality, motion realness, and alignment.",
+    why:"The anti-demo-reel: publishing every output for a fixed prompt set lets anyone re-judge the claim. Later models, open and closed, evaluate against its released videos.",
+    watch:"Human A/B protocols differ between labs even on identical prompts, and “beats Movie Gen (2024)” ages fast as the field moves." },
+
+  /* ---- Human preference ---- */
+  { id:"aaarena", name:"Artificial Analysis Video Arena", year:2024, fam:"pref", status:"work", pct:null, score:"Elo ranking",
+    tag:"Blind pairwise human votes across T2V and I2V; the ranking launches quote.",
+    how:"Voters see two anonymous generations for the same prompt and pick the better one; Elo-style ratings aggregate thousands of matchups, tracked separately for text-to-video and image-to-video.",
+    why:"The closest thing video gen has to LMArena — independent, ongoing, human. Seedance 1.0’s launch led with debuting #1 across both tracks; Veo and Kling releases cite their standing.",
+    watch:"Preference compresses everything — adherence, aesthetics, motion — into one first-glance vote. The prompt mix skews cinematic; your use case may not." },
+  { id:"genaiarena", name:"GenAI-Arena", year:2024, fam:"pref", status:"work", pct:null, score:"Elo ranking",
+    tag:"The open, academic arena — image and video, votes public.",
+    how:"A Hugging Face arena (TIGER-Lab) running blind pairwise battles for open image and video generators, with vote data released for study.",
+    why:"Covers the open models commercial arenas deprioritize, and its auditable votes let researchers study voter behavior itself.",
+    watch:"Far fewer votes than commercial arenas means wide error bars and slow updates; frontier closed models are missing or stale." },
+  { id:"inhouse", name:"In-house win-rate studies", year:2022, fam:"pref", status:"work", pct:null, score:"win rate %",
+    tag:"“Preferred over X 62% of the time” — the launch-day staple.",
+    how:"Lab-internal prompt sets, generations from both models, contracted raters picking winners along axes like quality, motion and adherence. Published as bar charts in tech reports — Veo, Kling, Seedance and Wan reports all lean on them.",
+    why:"Fast, targeted, controllable — a lab can measure exactly the capability it just shipped. Often the only eval covering a brand-new feature (audio sync, multi-shot).",
+    watch:"Unreproducible by construction: prompts, raters, sample counts and the rival’s version are all chosen by the party reporting the win. Hazard #5 in the flesh." },
+
+  /* ---- Prompt fidelity ---- */
+  { id:"t2vcompbench", name:"T2V-CompBench", year:2024, fam:"fid", status:"work", pct:null, score:"per-axis scores",
+    tag:"Compositional prompts video models actually fail: counting, binding, interaction.",
+    how:"700 prompts across seven compositional axes — attribute binding (static and changing), spatial relations, motion direction, actions, interactions, numeracy — scored per-axis by MLLM judges, detectors and trackers.",
+    why:"Separates “renders a pretty dog” from “renders the red ball LEFT of the blue cube, rolling right.” Exposes adherence gaps that aesthetic-heavy suites hide.",
+    watch:"The judge stack is heavy and each axis has its own failure modes; per-axis gaps between models mean more than absolute numbers." },
+  { id:"geneval", name:"GenEval", year:2023, fam:"fid", status:"sat", pct:92, score:"≈0.92",
+    tag:"Detection-checked T2I adherence: objects, counts, colors, positions.",
+    how:"Prompts with verifiable content (“two dogs and one cat”); an object detector checks the render. No taste involved — the count is right or it isn’t.",
+    why:"Cheap, objective, and in every image-model report (SD3, Flux, Imagen, Qwen-Image, Seedream) — and quoted by video labs for their T2I siblings and first frames.",
+    watch:"Prompt-rewriting LLMs in front of the generator inflate scores; the top now clusters above 0.9 and its templates are simple enough to overfit." },
+  { id:"dpgbench", name:"DPG-Bench", year:2024, fam:"fid", status:"work", pct:88, score:"≈88",
+    tag:"Dense, paragraph-length prompts scored by a VQA judge.",
+    how:"1,000+ dense prompts packing many attributes and relations; an MLLM answers questions derived from each prompt to score adherence.",
+    why:"The long-prompt companion to GenEval — much closer to how people actually prompt production models. Standard in image tech reports, increasingly cited for video models’ still modes.",
+    watch:"VQA judges miss fine-grained errors and can be charmed by plausible-looking scenes; papers use different judge versions, so cross-paper numbers wobble." },
+  { id:"t2icompbench", name:"T2I-CompBench", year:2023, fam:"fid", status:"work", pct:70, score:"≈0.7 avg",
+    tag:"Attribute binding and spatial logic for images — the compositional classic.",
+    how:"6,000 prompts across color/shape/texture binding, spatial and non-spatial relations and complex scenes; scored by BLIP-VQA and detectors, with a “++” revision upgrading the judges.",
+    why:"Compositionality was the defining T2I failure of the SD-1.5 era; this benchmark quantified the climb out of it and still separates models on binding.",
+    watch:"Judge models date quickly — the ++ revision exists because the originals drifted from human ratings. The easy axes are near ceiling." },
+
+  /* ---- Physics & world ---- */
+  { id:"physicsiq", name:"Physics-IQ", year:2025, fam:"phys", status:"frontier", pct:25, score:"≈25/100",
+    tag:"Given 3 seconds of real footage, continue it — physics decides the score.",
+    how:"Real filmed scenarios (fluids, collisions, optics, materials); models generate the continuation; scoring compares where, when and how motion unfolds against the real outcome, normalized so paired real videos land near 100.",
+    why:"DeepMind’s direct audit of the “world model” claim: no prompt taste, no aesthetics — just whether the model’s imagined future matches the actual one. Headline finding: visual realism and physical understanding are nearly uncorrelated.",
+    watch:"Continuation-style eval favors models with strong I2V/V2V modes. Best scores sit around a quarter of the ceiling — expect fast movement and version footnotes." },
+  { id:"videophy2", name:"VideoPhy-2", year:2025, fam:"phys", status:"frontier", pct:30, score:"≈30% joint",
+    tag:"Does the generated video obey commonsense physics? Mostly, no.",
+    how:"Thousands of action-centric prompts (sports, object interactions); raters and an automatic judge score semantic adherence and physical commonsense jointly, with a hard subset isolating the brutal cases.",
+    why:"The standing physics scoreboard between frontier releases — open leaderboard, harder each version, and the joint metric punishes pretty-but-impossible videos.",
+    watch:"Judging physics from pixels is noisy at the margins, and the automatic judge agrees with humans imperfectly. The hard-subset numbers are the honest ones." },
+  { id:"phygenbench", name:"PhyGenBench", year:2024, fam:"phys", status:"frontier", pct:55, score:"≈0.55 PCScore",
+    tag:"27 physical laws, four domains, prompts a high-schooler could verify.",
+    how:"160 prompts targeting mechanics, optics, thermal and material properties (“light passing through a prism…”); a staged VLM pipeline checks whether the law actually holds in the output.",
+    why:"Law-by-law diagnosis instead of a single vibe score — tells a lab which physics its model fakes convincingly and which it flunks outright.",
+    watch:"Small prompt set; staged VLM judging inherits VLM blind spots; and 27 known laws are few enough to teach to the test." },
+  { id:"worldscore", name:"WorldScore", year:2025, fam:"phys", status:"frontier", pct:60, score:"≈60/100",
+    tag:"One ruler for “world models”: video generators and 3D scene systems alike.",
+    how:"Long camera-instructed rollouts through described scenes, scored on controllability (did the camera do what was asked), visual quality, and dynamics — the same protocol applied to video, 3D and 4D generators.",
+    why:"Lets the two “world model” communities meet on one leaderboard, and measures camera obedience — a capability arenas barely see.",
+    watch:"Young, and instruction formats favor systems trained for camera control; treat cross-paradigm comparisons as directional, not decisive." },
+
+  /* ---- Distance metrics ---- */
+  { id:"fvd", name:"FVD", year:2018, fam:"dist", status:"ret", pct:null, score:"lower is better",
+    tag:"Fréchet distance on video features — the field’s original single number.",
+    how:"Embed real and generated clips with an action-recognition network (I3D, Kinetics-pretrained); report the Fréchet distance between the two distributions. Standard protocol: zero-shot UCF-101.",
+    why:"For five years, THE number: Make-A-Video, Imagen Video and the Gen-era models raced it downward. Still everywhere in academic papers, because every prior result is denominated in it.",
+    watch:"Dominated by per-frame appearance — largely blind to temporal nonsense — and it swings with frame count, resolution and reference split. Frontier launch reports dropped it entirely. Plate III’s lifecycle specimen." },
+  { id:"clipsim", name:"CLIPSIM", year:2021, fam:"dist", status:"ret", pct:null, score:"≈0.3 typical",
+    tag:"Frame-wise CLIP similarity to the prompt — early alignment on the cheap.",
+    how:"Embed each frame and the prompt with CLIP; average the cosine similarity (standard prompt set: MSR-VTT).",
+    why:"The first scalable text-alignment number for video; every 2022–23 paper reported it beside FVD.",
+    watch:"CLIP sees stills, not motion — “a man runs” scores the same frozen or moving — and differences of 0.01 got reported as wins. Replaced by VQA/MLLM judges everywhere serious." },
+  { id:"fid", name:"FID & IS", year:2017, fam:"dist", status:"ret", pct:null, score:"lower is better",
+    tag:"The image-era distance metrics video inherited — and outgrew.",
+    how:"FID: Fréchet distance between Inception-v3 feature distributions of real vs. generated images. IS: an ImageNet classifier’s confidence and diversity on outputs. Applied per-frame, both leaked into video papers.",
+    why:"A decade of GAN and diffusion progress was measured in FID; it still gates many academic claims and reviewer checklists.",
+    watch:"Inception features are 2015-vintage and miss what modern models differ on; FID rewards distribution-matching, not correctness or beauty. Successors (DINOv2-based distances, CMMD) fix pieces; adoption is inertia-bound." },
+  { id:"jedi", name:"JEDi", year:2024, fam:"dist", status:"work", pct:null, score:"distance metric",
+    tag:"FVD’s would-be successor: video-native features, far fewer samples.",
+    how:"Same distributional idea as FVD, but with embeddings from a self-supervised video model (V-JEPA) and a kernel distance that converges with a fraction of the clips.",
+    why:"Built directly from FVD’s documented failures — better correlation with human judgment of temporal realism, and practical on small eval sets.",
+    watch:"Adoption is the whole battle: papers keep FVD for comparability with five years of prior results. Metrics have network effects too." },
+
+  /* ---- Image-side staples ---- */
+  { id:"drawbench", name:"DrawBench", year:2022, fam:"img", status:"ret", pct:null, score:"human side-by-side",
+    tag:"Imagen’s 200 adversarial prompts — the T2I proving ground of 2022.",
+    how:"200 prompts probing composition, text rendering and rare concepts; humans compare two models’ outputs side by side.",
+    why:"Set the template for prompt-suite-plus-human-preference evaluation; every image model of 2022–23 reported it.",
+    watch:"200 public prompts were absorbed by the ecosystem within a year; retired to history sections, its DNA living on in PartiPrompts and successors." },
+  { id:"partiprompts", name:"PartiPrompts", year:2022, fam:"img", status:"ret", pct:null, score:"1,600+ prompts",
+    tag:"P2: a categorized prompt taxonomy for human evaluation.",
+    how:"1,600+ prompts organized by category and challenge dimension, intended as a pool for human side-by-side studies; no fixed metric of its own.",
+    why:"Bigger and better-organized than DrawBench — the standard human-eval prompt pool of the Parti/Imagen era, still mined for hard cases.",
+    watch:"A prompt list, not a benchmark: results depend entirely on the protocol bolted on. Public long enough to sit in every training corpus’s neighborhood." },
+  { id:"hps", name:"HPSv2 & ImageReward", year:2023, fam:"img", status:"work", pct:null, score:"preference score",
+    tag:"Trained human-preference models — judges by profession, targets by accident.",
+    how:"Reward models trained on hundreds of thousands of human choices between images; they score any image for predicted human preference, instantly.",
+    why:"Scalable stand-ins for human raters in papers — and, crucially, RL objectives: much of modern image-model polish is optimization against exactly these models.",
+    watch:"Optimize against a taste model and you get its taste — glossy, high-contrast, centered. As benchmarks they’re saturating; as training targets they cause hazard #4." },
+];
+
+/* ---- lifecycle stages (FVD) ---- */
+const STAGES = [
+  { t:"Introduced", years:"FVD: 2018", pos:[10,82],
+    body:"A benchmark ships because someone needs a weakness made measurable — or here, because nobody could compare video models at all. FVD adapted the image world’s Fréchet trick to video features: finally, one number for “does this look like real footage.”",
+    case:"<b>FVD, day one:</b> before it, video papers compared cherry-picked frames and ran bespoke human studies nobody could reproduce. A flawed common ruler beat no ruler." },
+  { t:"Discriminative", years:"FVD: 2019–23", pos:[42,55],
+    body:"The golden years: every text-to-video paper reported zero-shot UCF-101 FVD, and the number fell fast enough to narrate the field. Reviewers demanded it; nobody shipped without it.",
+    case:"<b>FVD, mid-life:</b> Make-A-Video, Imagen Video, Phenaki and the Gen-era models all raced the same scale downward — from hundreds toward double digits. Its slope was the research agenda." },
+  { t:"Saturating", years:"FVD: 2023–24", pos:[72,22],
+    body:"The number and the eye part ways. FVD turns out to be dominated by per-frame appearance — largely blind to temporal nonsense — and to swing with frame counts, resolution and reference splits. Models with visibly better motion score worse, and vice versa.",
+    case:"<b>FVD, ageing:</b> a 2024 content-bias study showed it barely reacts to temporal corruption humans spot instantly; JEDi was proposed the same year to replace its features." },
+  { t:"Retired", years:"FVD: 2024 →", pos:[92,13],
+    body:"Frontier launches simply stopped reporting it — no FVD in the Veo, Seedance, Kling or Sora-era reports; arenas, suite scores and human panels took its place. It survives in academic papers, where five years of results are denominated in it.",
+    case:"<b>FVD, emeritus:</b> the metric didn’t get worse — the models outgrew what it measures. Its successor problem, grading temporal realism, is still open." },
+];
+
+/* ---- chooser goals ---- */
+const GOALS = [
+  { label:"Which model for my product",
+    picks:[
+      ["AA Video Arena","independent human preference across T2V and I2V — the best single shortlisting signal"],
+      ["VBench dimensions","check the dimension table for your failure modes (motion, consistency), not the total"]],
+    caveat:"Arena prompts skew cinematic. Nothing replaces a 50-prompt bake-off on your own use case with your own raters." },
+  { label:"Prompt adherence",
+    picks:[
+      ["T2V-CompBench","counting, binding, motion direction — where video models actually fail"],
+      ["GenEval / DPG-Bench","the still-image adherence pair; first frames inherit these skills"]],
+    caveat:"Production APIs quietly rewrite your prompt with an LLM first — you’re benchmarking the rewriter too." },
+  { label:"Physics & realism claims",
+    picks:[
+      ["Physics-IQ","continuation vs. reality; the cleanest “world model” test"],
+      ["VideoPhy-2","commonsense physics at leaderboard scale"],
+      ["PhyGenBench","law-by-law diagnosis"]],
+    caveat:"Best scores are around a quarter of the ceiling. Treat “world model” as a roadmap word, not a shipped feature." },
+  { label:"Comparing open models (research)",
+    picks:[
+      ["VBench","the common denominator every open release reports"],
+      ["FVD + JEDi","legacy comparability plus a modern distance — report both"]],
+    caveat:"Match configs exactly: resolution, frame count, sampler. FVD moves more with your eval pipeline than with your model." },
+  { label:"Image / frame quality",
+    picks:[
+      ["GenEval","objective, detection-checked adherence"],
+      ["DPG-Bench","dense-prompt adherence via VQA judge"],
+      ["HPSv2 / ImageReward","human-preference proxies — useful, and gameable"]],
+    caveat:"Optimizing against preference models produces the glossy “AI look” — high scores, monotone taste." },
+  { label:"Long-form & storytelling",
+    picks:[
+      ["MovieGenBench protocol","fixed prompts, uncurated outputs, human A/B — the honest template"],
+      ["In-house panels","currently the only coverage for multi-shot and audio — read the methodology fine print"]],
+    caveat:"No standard exists yet for narrative video. Anyone quoting one number for “storytelling” is selling something." },
+];
+
+/* ================= RENDER: specimen cards ================= */
+const cardsEl = document.getElementById("cards");
+const famChipsEl = document.getElementById("famChips");
+const statusChipsEl = document.getElementById("statusChips");
+const countEl = document.getElementById("countLine");
+let famFilter = "all", statusFilter = "all";
+
+function famCount(k){ return BENCH.filter(b => b.fam === k).length; }
+
+function makeChip(label, value, dotColor, group){
+  const b = document.createElement("button");
+  b.className = "chip";
+  b.setAttribute("aria-pressed", value === "all" ? "true" : "false");
+  b.dataset.value = value;
+  b.dataset.group = group;
+  if (dotColor) {
+    const d = document.createElement("span");
+    d.className = "fdot";
+    d.style.background = dotColor;
+    b.appendChild(d);
+  }
+  b.appendChild(document.createTextNode(label));
+  return b;
+}
+
+famChipsEl.appendChild(makeChip("All", "all", null, "fam"));
+Object.entries(FAMS).forEach(([k, f]) =>
+  famChipsEl.appendChild(makeChip(`${f.name} (${famCount(k)})`, k, f.color, "fam")));
+statusChipsEl.appendChild(makeChip("All", "all", null, "status"));
+Object.entries(STATUSES).forEach(([k, s]) =>
+  statusChipsEl.appendChild(makeChip(s.name, k, s.color, "status")));
+
+document.querySelectorAll(".chiprow").forEach(row => {
+  row.addEventListener("click", e => {
+    const chip = e.target.closest(".chip");
+    if (!chip) return;
+    const group = chip.dataset.group;
+    row.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", "false"));
+    chip.setAttribute("aria-pressed", "true");
+    if (group === "fam") famFilter = chip.dataset.value;
+    else statusFilter = chip.dataset.value;
+    applyFilter();
+  });
+});
+
+function cardHTML(b){
+  const f = FAMS[b.fam], s = STATUSES[b.status];
+  const meter = b.pct !== null
+    ? `<div class="meter-row">
+         <div class="track"><div class="fill" style="width:${b.pct}%;background:${f.color}"></div></div>
+         <span class="meter-val">${b.score}</span>
+       </div>
+       <div class="meter-cap">top reported score, approx.</div>`
+    : `<div class="meter-row"><span class="meter-val">${b.score}</span></div>
+       <div class="meter-cap">not a 0–100 scale</div>`;
+  return `
+  <article class="spec" data-fam="${b.fam}" data-status="${b.status}">
+    <button class="spec-head" aria-expanded="false">
+      <div class="spec-top">
+        <span class="fam-tag"><span class="fdot" style="background:${f.color}"></span>${f.name}</span>
+        <span class="badge"><i style="background:${s.color}"></i>${s.name}</span>
+      </div>
+      <h3>${b.name} <span class="yr">est. ${b.year}</span> <span class="chev">▾</span></h3>
+      <p class="tag">${b.tag}</p>
+      ${meter}
+    </button>
+    <div class="spec-body">
+      <div class="spec-body-in">
+        <div class="spec-body-pad">
+          <h4>How it works</h4><p>${b.how}</p>
+          <h4>Why labs use it</h4><p>${b.why}</p>
+          <h4>Watch out</h4><p>${b.watch}</p>
+        </div>
+      </div>
+    </div>
+  </article>`;
+}
+
+cardsEl.innerHTML = BENCH.map(cardHTML).join("") +
+  `<p class="empty" style="display:none">No specimens match this filter — a rare sighting indeed.</p>`;
+
+cardsEl.addEventListener("click", e => {
+  const head = e.target.closest(".spec-head");
+  if (!head) return;
+  const card = head.closest(".spec");
+  const open = card.classList.toggle("open");
+  head.setAttribute("aria-expanded", open ? "true" : "false");
+});
+
+function applyFilter(){
+  let shown = 0;
+  cardsEl.querySelectorAll(".spec").forEach(c => {
+    const ok = (famFilter === "all" || c.dataset.fam === famFilter) &&
+               (statusFilter === "all" || c.dataset.status === statusFilter);
+    c.style.display = ok ? "" : "none";
+    if (ok) shown++;
+  });
+  cardsEl.querySelector(".empty").style.display = shown ? "none" : "";
+  countEl.textContent = `Showing ${shown} of ${BENCH.length} specimens`;
+}
+applyFilter();
+
+/* ================= RENDER: lifecycle ================= */
+const stageNote = document.getElementById("stageNote");
+const cycleDot = document.getElementById("cycleDot");
+function setStage(i){
+  const s = STAGES[i];
+  stageNote.innerHTML = `
+    <h3>${i + 1}. ${s.t}</h3>
+    <span class="years">${s.years}</span>
+    <p>${s.body}</p>
+    <p class="case">${s.case}</p>`;
+  cycleDot.style.left = s.pos[0] + "%";
+  cycleDot.style.top = s.pos[1] + "%";
+  document.querySelectorAll(".stage").forEach((b, j) =>
+    b.setAttribute("aria-pressed", j === i ? "true" : "false"));
+}
+document.querySelectorAll(".stage").forEach(b =>
+  b.addEventListener("click", () => setStage(+b.dataset.stage)));
+setStage(0);
+
+/* ================= RENDER: dimension chart ================= */
+const DIMS = [
+  { name: "Subject consistency", a: 93.1, b: 98.6 },
+  { name: "Background consistency", a: 95.2, b: 98.9 },
+  { name: "Motion smoothness", a: 96.8, b: 99.2 },
+  { name: "Dynamic degree", a: 71.2, b: 43.5 },
+  { name: "Aesthetic quality", a: 64.0, b: 66.3 },
+];
+/* weights: [subject, background, smoothness, dynamic, aesthetic] */
+const WEIGHTS = {
+  default: [0.22, 0.22, 0.30, 0.06, 0.20],
+  motion:  [0.15, 0.15, 0.20, 0.35, 0.15],
+};
+
+const dimRowsEl = document.getElementById("dimRows");
+const dimVerdictEl = document.getElementById("dimVerdict");
+
+function barRow(name, a, b, isTotal){
+  return `
+  <div class="dimrow${isTotal ? " total" : ""}">
+    <span class="dname">${name}</span>
+    <div class="dbars">
+      <div class="dbarrow"><div class="dtrack"><div class="dfill dfa" style="width:${a}%;background:var(--f-suite)"></div></div><span class="dval dva">${a.toFixed(1)}</span></div>
+      <div class="dbarrow"><div class="dtrack"><div class="dfill dfb" style="width:${b}%;background:var(--f-img)"></div></div><span class="dval dvb">${b.toFixed(1)}</span></div>
+    </div>
+  </div>`;
+}
+
+dimRowsEl.innerHTML =
+  DIMS.map(d => barRow(d.name, d.a, d.b, false)).join("") +
+  barRow("Weighted total", 0, 0, true);
+
+const totalRow = dimRowsEl.querySelector(".dimrow.total");
+
+function setWeights(mode){
+  const w = WEIGHTS[mode];
+  const tA = DIMS.reduce((s, d, i) => s + d.a * w[i], 0);
+  const tB = DIMS.reduce((s, d, i) => s + d.b * w[i], 0);
+  totalRow.querySelector(".dfa").style.width = tA + "%";
+  totalRow.querySelector(".dfb").style.width = tB + "%";
+  totalRow.querySelector(".dva").textContent = tA.toFixed(1);
+  totalRow.querySelector(".dvb").textContent = tB.toFixed(1);
+  const diff = Math.abs(tA - tB).toFixed(1);
+  const gap = Math.abs(DIMS[3].a - DIMS[3].b).toFixed(1);
+  dimVerdictEl.textContent = tA >= tB
+    ? `Motion-first weights: Bittern-2 wins by ${diff} points. Same videos — the leaderboard lives in the weights.`
+    : `VBench-style weights: near-static Grebe 1.6 wins by ${diff} points — while trailing by ${gap} points on motion.`;
+  document.getElementById("wDefault").setAttribute("aria-pressed", mode === "default" ? "true" : "false");
+  document.getElementById("wMotion").setAttribute("aria-pressed", mode === "motion" ? "true" : "false");
+}
+document.getElementById("wDefault").addEventListener("click", () => setWeights("default"));
+document.getElementById("wMotion").addEventListener("click", () => setWeights("motion"));
+setWeights("default");
+
+/* ================= RENDER: chooser ================= */
+const goalChipsEl = document.getElementById("goalChips");
+const goalPanelEl = document.getElementById("goalPanel");
+GOALS.forEach((g, i) => {
+  const b = document.createElement("button");
+  b.className = "chip";
+  b.textContent = g.label;
+  b.setAttribute("aria-pressed", i === 0 ? "true" : "false");
+  b.addEventListener("click", () => {
+    goalChipsEl.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", "false"));
+    b.setAttribute("aria-pressed", "true");
+    renderGoal(i);
+  });
+  goalChipsEl.appendChild(b);
+});
+function renderGoal(i){
+  const g = GOALS[i];
+  goalPanelEl.innerHTML = `
+    <div class="picks">${g.picks.map(([n, w]) =>
+      `<div class="pick"><span class="pname">${n}</span><span class="pwhy">${w}</span></div>`).join("")}
+    </div>
+    <p class="caveat"><b>Caveat</b>${g.caveat}</p>`;
+}
+renderGoal(0);
+</script>
+</body>
+</html>
